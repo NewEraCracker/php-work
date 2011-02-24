@@ -1,9 +1,8 @@
 <?php
-
 /**
-* Suhosin Configuration Checker v0.3
+* Suhosin Configuration Checker v0.4
 * @author NewEraCracker
-* @date 22-02-2011
+* @date 24-02-2011
 * @license Public Domain
 */
 
@@ -13,6 +12,7 @@
 
 // Value has to be the same or higher to pass tests
 $test_values = array(
+array( 'suhosin.get.max_name_length', 350 ),
 array( 'suhosin.post.max_array_index_length', 256 ),
 array( 'suhosin.post.max_totalname_length', 8192 ),
 array( 'suhosin.post.max_vars', 4096 ),

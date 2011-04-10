@@ -56,8 +56,6 @@ function check_proxy()
 	$userip    = (string) $_SERVER['REMOTE_ADDR'];
 	$useragent = (string) $_SERVER["HTTP_USER_AGENT"];
 	
-	$userip = "127.0.0.1";
-	
 	// Ban certain IPs
 	if ( count($banned_ips) )
 	{

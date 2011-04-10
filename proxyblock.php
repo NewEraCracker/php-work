@@ -4,8 +4,8 @@
  *---------------------
  *
  * Created by NewEraCracker
- * Date...: 27-03-2011
- * Version: 1.0.1
+ * Date...: 10-04-2011
+ * Version: 1.0.2
  *
  * Requirements:
  * = PHP 5.2 or higher
@@ -29,6 +29,9 @@ function check_proxy()
 	
 	// Ports to check
 	$check_ports = array(80,3128,8080);
+	
+	// Proxy headers
+	$check_headers = array ('HTTP_VIA', 'HTTP_X_FORWARDED_FOR', 'HTTP_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED', 'HTTP_CLIENT_IP', 'HTTP_FORWARDED_FOR_IP', 'VIA', 'X_FORWARDED_FOR', 'FORWARDED_FOR', 'X_FORWARDED', 'FORWARDED', 'CLIENT_IP', 'FORWARDED_FOR_IP', 'HTTP_PROXY_CONNECTION');
 
 	// Banned
 	$banned_ips = array('193.200.150.');
@@ -116,7 +119,7 @@ function check_proxy()
 	}
 
 	// Check for proxy
-	if ( count($check_ports) )
+	if ( count($check_ports) || count($check_headers) )
 	{	
 		// Connect and select database
 		$db_link = mysql_connect($db_hostname,$db_username,$db_password) or die(mysql_error());
@@ -140,24 +143,41 @@ function check_proxy()
 		// Have we found it?
 		while ($row = mysql_fetch_assoc($db_result))
 		{
-			// No need for a port scan here
+			// No need for a port scan or check for headers here
 			return $row['proxy'];
+		}
+		
+		// Check for proxy headers
+		if( count($check_headers) )
+		{
+			foreach ($check_headers as $header)
+			{
+				if ( isset($_SERVER[$header]) )
+				{
+					$proxy = true;
+					break;
+				}
+			}
 		}
 
 		// Do a port scan
-		foreach($check_ports as $port)
+		if ( !$proxy && count($check_ports) )
 		{
-			$test = fsockopen($userip,$port);
-			$test = $test ? fclose($test) : false;
-
-			if($test !== false)
+			foreach($check_ports as $port)
 			{
-				$proxy = true;
-				break;
+				$test = fsockopen($userip,$port);
+
+				if($test !== false)
+				{
+					fclose($test);
+					$proxy = true;
+					break;
+				}
 			}
 		}
 		
 		// Delete older result and insert new
+		$proxy = intval($proxy);
 		$db_delete_ip = sprintf( "DELETE FROM `users` WHERE `ip`='%s'",mysql_real_escape_string($userip) );
 		$db_insert_ip = sprintf( "INSERT INTO `users` VALUES ('%s','{$proxy}',NOW())",mysql_real_escape_string($userip) );
 		mysql_query($db_delete_ip) or die(mysql_error());

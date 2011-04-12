@@ -22,9 +22,9 @@ function check_proxy()
 
 	// Database information
 	$db_hostname  = 'localhost';
-	$db_database  = 'nlplanet_proxydb';
-	$db_username  = 'nlplanet_proxydb';
-	$db_password  = 'proxydb';
+	$db_database  = 'proxydb';
+	$db_username  = 'username';
+	$db_password  = 'password';
 	$db_installed = false; // change to true after executing 1st time
 	
 	// Ports to check

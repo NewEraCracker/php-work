@@ -4,8 +4,8 @@
  *---------------------
  *
  * Created by NewEraCracker
- * Date...: 10-04-2011
- * Version: 1.0.2
+ * Date...: 12-04-2011
+ * Version: 1.0.3
  *
  * Requirements:
  * = PHP 5.2 or higher
@@ -22,16 +22,18 @@ function check_proxy()
 
 	// Database information
 	$db_hostname  = 'localhost';
-	$db_database  = 'proxydb';
-	$db_username  = 'username';
-	$db_password  = 'password';
+	$db_database  = 'nlplanet_proxydb';
+	$db_username  = 'nlplanet_proxydb';
+	$db_password  = 'proxydb';
 	$db_installed = false; // change to true after executing 1st time
 	
 	// Ports to check
-	$check_ports = array(80,3128,8080);
+	$check_ports = true;
+	$ports = array(3128,8080);
 	
 	// Proxy headers
-	$check_headers = array ('HTTP_VIA', 'HTTP_X_FORWARDED_FOR', 'HTTP_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED', 'HTTP_CLIENT_IP', 'HTTP_FORWARDED_FOR_IP', 'VIA', 'X_FORWARDED_FOR', 'FORWARDED_FOR', 'X_FORWARDED', 'FORWARDED', 'CLIENT_IP', 'FORWARDED_FOR_IP', 'HTTP_PROXY_CONNECTION');
+	$check_headers = true;
+	$headers = array('HTTP_VIA', 'HTTP_X_FORWARDED_FOR', 'HTTP_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED', 'HTTP_CLIENT_IP', 'HTTP_FORWARDED_FOR_IP', 'VIA', 'X_FORWARDED_FOR', 'FORWARDED_FOR', 'X_FORWARDED', 'FORWARDED', 'CLIENT_IP', 'FORWARDED_FOR_IP', 'HTTP_PROXY_CONNECTION');
 
 	// Banned
 	$banned_ips = array('193.200.150.');
@@ -56,8 +58,18 @@ function check_proxy()
 	$userip    = (string) $_SERVER['REMOTE_ADDR'];
 	$useragent = (string) $_SERVER["HTTP_USER_AGENT"];
 	
+	// Fix configuration
+	if(!$check_ports)
+	{
+		$ports = array();
+	}
+	if(!$check_headers)
+	{
+		$headers = array();
+	}
+	
 	// Ban certain IPs
-	if ( count($banned_ips) )
+	if( count($banned_ips) )
 	{
 		foreach($banned_ips as $ip)
 		{
@@ -72,7 +84,7 @@ function check_proxy()
 	}
 
 	// Ban certain User-Agents
-	if ( count($banned_useragents) )
+	if( count($banned_useragents) )
 	{
 		foreach($banned_useragents as $ua)
 		{
@@ -87,7 +99,7 @@ function check_proxy()
 	}
 
 	// Allow certain IPs
-	if ( count($allowed_ips) )
+	if( count($allowed_ips) )
 	{
 		foreach($allowed_ips as $ip)
 		{
@@ -102,7 +114,7 @@ function check_proxy()
 	}
 
 	// Allow certain User-Agents
-	if ( count($allowed_useragents) )
+	if( count($allowed_useragents) )
 	{
 		foreach($allowed_useragents as $ua)
 		{
@@ -117,7 +129,7 @@ function check_proxy()
 	}
 
 	// Check for proxy
-	if ( count($check_ports) || count($check_headers) )
+	if( count($ports) || count($headers) )
 	{	
 		// Connect and select database
 		$db_link = mysql_connect($db_hostname,$db_username,$db_password) or die(mysql_error());
@@ -146,11 +158,11 @@ function check_proxy()
 		}
 		
 		// Check for proxy headers
-		if( count($check_headers) )
+		if( count($headers) )
 		{
-			foreach ($check_headers as $header)
+			foreach ($headers as $header)
 			{
-				if ( isset($_SERVER[$header]) )
+				if( isset($_SERVER[$header]) )
 				{
 					$proxy = true;
 					break;
@@ -159,9 +171,9 @@ function check_proxy()
 		}
 
 		// Do a port scan
-		if ( !$proxy && count($check_ports) )
+		if( !$proxy && count($ports) )
 		{
-			foreach($check_ports as $port)
+			foreach($ports as $port)
 			{
 				$test = fsockopen($userip,$port);
 

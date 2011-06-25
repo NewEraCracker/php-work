@@ -1,4 +1,7 @@
 <?php
+// Author: NewEraCracker
+// License: Public Domain
+
 function improved_explode($delimiter,$string,$escape=null)
 {
     $exploded = explode($delimiter,$string);
@@ -40,7 +43,7 @@ function improved_explode($delimiter,$string,$escape=null)
     return $exploded;
 }
 
-//test
+// Example usage
 $mystring = "test=2\\=2";
 var_dump( improved_explode('=',$mystring,'\\') );
 

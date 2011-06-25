@@ -1,3 +1,7 @@
+<?php
+// Author: NewEraCracker
+// License: Public Domain
+?>
 SiMPLE PHP ENCODER BY NEWERACRACKER [v0.0.6]<br/>
 <br/>
 Encoding: base64_encode(gzdeflate($text,9));<br/>

@@ -1,4 +1,7 @@
 <?php
+// Author: NewEraCracker
+// License: Public Domain
+
 //@link: http://php.net/manual/en/function.inet-pton.php
 if ( !function_exists('inet_pton'))
 {

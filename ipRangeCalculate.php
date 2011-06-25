@@ -158,7 +158,7 @@ function ipRangeCalculate($ip,$range)
 	return array("lower"=>inet_ntop($ip_lower_pack),"higher"=>inet_ntop($ip_higher_pack));
 }
 
-// Sample useage
+// Example usage
 if( $range = ipRangeCalculate(@$_GET['ip'],@$_GET['range']) )
 {
 	echo "<pre>";

@@ -15,68 +15,97 @@
  */
 
 //@link: http://php.net/manual/en/function.inet-pton.php
-if ( !function_exists('inet_pton')) {
-        function inet_pton($ip){
-                //ipv4
-                if (strpos($ip, '.') !== FALSE) {
-                        $ip = trim($ip,':f');
-                        $ip = pack('N',ip2long($ip));
-                }
-                //ipv6
-                elseif (strpos($ip, ':') !== FALSE) {
+if ( !function_exists('inet_pton'))
+{
+	function inet_pton($ip)
+	{
+		if(strpos($ip, '.') !== FALSE)
+		{
+			// Pack ipv4
+			$ip = trim($ip,':f');
+			$ip = pack('N',ip2long($ip));
+		}
+		elseif(strpos($ip, ':') !== FALSE)
+		{
+			// Expand ipv6
+			$_count = count(explode(':', $ip));
+			while($_count<=8)
+			{
+				$ip = str_replace('::',':0::',$ip);
+				$_count++;
+			}
+			unset($_count);
+			$ip = str_replace('::',':',$ip);
 
-                        //Short ipv6 fix by NewEraCracker
-                        $_count = count(explode(':', $ip));
-                        while($_count<=8) {
-                                $ip = str_replace('::',':0::',$ip);
-                                $_count++;
-                        }
-                        unset($_count);
-                        $ip = str_replace('::',':',$ip);
-                        //Newfags can't triforce!
-
-                        $ip = explode(':', $ip);
-                        $res = str_pad('', (4*(8-count($ip))), '0000', STR_PAD_LEFT);
-                        foreach ($ip as $seg) {
-                                $res .= str_pad($seg, 4, '0', STR_PAD_LEFT);
-                        }
-                        $ip = pack('H'.strlen($res), $res);
-                }
-                return $ip;
-        }
+			// Pack ipv6
+			$ip = explode(':', $ip);
+			$res = str_pad('', (4*(8-count($ip))), '0000', STR_PAD_LEFT);
+			foreach ($ip as $seg)
+			{
+				$res .= str_pad($seg, 4, '0', STR_PAD_LEFT);
+			}
+			$ip = pack('H'.strlen($res), $res);
+		}
+		else
+		{
+			return false;
+		}
+		
+		if(strlen($ip)==4 || strlen($ip)==16)
+		{
+			return $ip;
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
 }
 
 //@link: http://php.net/manual/en/function.inet-ntop.php
-if ( !function_exists('inet_ntop')){
-        function inet_ntop($ip){
-                if (strlen($ip)==4){
-                        //ipv4
-                        list(,$ip)=unpack('N',$ip);
-                        $ip=long2ip($ip);
-                }
-                elseif(strlen($ip)==16){
-                        //ipv6
-                        $ip=bin2hex($ip);
-                        $ip=substr(chunk_split($ip,4,':'),0,-1);
-                        $ip=explode(':',$ip);
-                        $res='';
-                        foreach($ip as $seg) {
-                                while($seg{0}=='0') $seg=substr($seg,1);
-                                if ($seg!='') {
-                                        $res.=($res==''?'':':').$seg;
-                                } else {
-                                        if (strpos($res,'::')===false) {
-                                                if (substr($res,-1)==':') continue;
-                                                $res.=':';
-                                                continue;
-                                        }
-                                        $res.=($res==''?'':':').'0';
-                                }
-                        }
-                        $ip=$res;
-                }
-                return $ip;
-        }
+if ( !function_exists('inet_ntop'))
+{
+	function inet_ntop($ip){
+		if(strlen($ip)==4)
+		{
+			// Unpack ipv4
+			list(,$ip)=unpack('N',$ip);
+			$ip=long2ip($ip);
+		}
+		elseif(strlen($ip)==16)
+		{
+			// Unpack ipv6
+			$ip=bin2hex($ip);
+			$ip=substr(chunk_split($ip,4,':'),0,-1);
+			$ip=explode(':',$ip);
+			$res='';
+			foreach($ip as $seg)
+			{
+				while($seg{0}=='0') $seg=substr($seg,1);
+				if($seg!='')
+				{
+					$res.=($res==''?'':':').$seg;
+				}
+				else
+				{
+					if (strpos($res,'::')===false) {
+							if (substr($res,-1)==':') continue;
+							$res.=':';
+							continue;
+					}
+					$res.=($res==''?'':':').'0';
+				}
+			}
+			$ip=$res;
+		}
+		else
+		{
+			return false;
+		}
+
+		return $ip;
+	}
 }
 
 //@link: http://blog.magicaltux.net/2010/02/18/invision-power-board-and-ipv6-a-dirty-hack/

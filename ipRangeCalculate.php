@@ -159,6 +159,10 @@ function ipRangeCalculate($ip,$range)
 }
 
 // Example usage
+//
+// 127.0.0.1/8
+// ipRangeCalculate("127.0.0.1",8);
+//
 if( $range = ipRangeCalculate(@$_GET['ip'],@$_GET['range']) )
 {
 	echo "<pre>";

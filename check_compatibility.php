@@ -2,7 +2,7 @@
 /* 
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.3 Beta
+	@version 0.3.1 Beta
 	@date    26/06/2011
 	@license Public Domain
 	
@@ -180,6 +180,6 @@ if( isset($errors) && count($errors) )
 else
 {
 	// Balls to you!
-	echo "Congratulations, no problems have been detected";
+	echo "Congratulations, no problems have been detected.";
 }
 echo "</pre>";

@@ -39,37 +39,36 @@ ob_start();
 
 if( extension_loaded('suhosin') )
 {
-    $problems = 0;
-    echo "<b>Suhosin installation detected!</b>".PHP_EOL;
-    
-    foreach($test_false as $test)
-    {
-        if( ini_get($test) != false )
-        {
-            echo "Please ask your host to <b>disable (turn off) {$test}</b> in php.ini".PHP_EOL;
-            $problems++;
-        }
-    }
-    foreach($test_values as $test)
-    {
-        if( isset($test['0']) && isset($test['1']) )
-        {
-            if( ini_get($test['0']) < $test['1'])
-            {
-                echo "Please ask your host to set <b>{$test['0']}</b> in php.ini to <b>{$test['1']}</b> or higher".PHP_EOL;
-                $problems++;
-            }
-        }
-    }
-    if($problems == 0)
-    {
-        echo "<b>No problems detected!</b>".PHP_EOL;
-    }
+	$problems = 0;
+	echo "<b>Suhosin installation detected!</b>".PHP_EOL;
 
+	foreach($test_false as $test)
+	{
+		if( ini_get($test) != false )
+		{
+			echo "Please ask your host to <b>disable (turn off) {$test}</b> in php.ini".PHP_EOL;
+			$problems++;
+		}
+	}
+	foreach($test_values as $test)
+	{
+		if( isset($test['0']) && isset($test['1']) )
+		{
+			if( ini_get($test['0']) < $test['1'])
+			{
+				echo "Please ask your host to set <b>{$test['0']}</b> in php.ini to <b>{$test['1']}</b> or higher".PHP_EOL;
+				$problems++;
+			}
+		}
+	}
+	if($problems == 0)
+	{
+		echo "<b>No problems detected!</b>".PHP_EOL;
+	}
 }
 else
 {
-    echo "<b>There is no Suhosin in here :)</b>".PHP_EOL;
+	echo "<b>There is no Suhosin in here :)</b>".PHP_EOL;
 }
 
 $output = ob_get_contents();

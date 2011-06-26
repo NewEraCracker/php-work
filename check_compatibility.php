@@ -2,7 +2,7 @@
 /* 
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.2 Alpha
+	@version 0.3 Beta
 	@date    26/06/2011
 	@license Public Domain
 	
@@ -78,7 +78,7 @@ array( 'prettyname'		=> "Perl-Compatible Regular Expressions",
 array( 'prettyname'		=> "Reflection Class",
 	   'extensionname'	=> "reflection" ),
 	   
-array( 'prettyname'		=> "SimpleXML",
+array( 'prettyname'		=> "XML Parser",
 	   'extensionname'	=> "xml" ),
 
 array( 'prettyname'		=> "SPL",

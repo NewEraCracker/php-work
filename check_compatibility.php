@@ -2,7 +2,7 @@
 /* 
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.3.1 Beta
+	@version 0.4.0 RC
 	@date    26/06/2011
 	@license Public Domain
 
@@ -46,6 +46,13 @@ foreach( $functionsToBeEnabled as $test )
 	}
 }
 
+// Magic Quotes
+if ( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
+{
+	$errors[] = "magic_quotes_gpc is enabled in your php.ini! Please ask your host to disable it for better functionality.";
+}
+
+// Safe Mode
 if( @ini_get('safe_mode') )
 {
 	$errors[] = 'PHP must not be running in safe_mode. Please ask your host to disable the PHP safe_mode setting.';

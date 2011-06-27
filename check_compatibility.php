@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.5.2
+	@version 0.5.3
 	@date    27/06/2011
 	@license Public Domain
 
@@ -193,7 +193,7 @@ if( $memLimit = @ini_get('memory_limit') )
 	$recLimit = (128*1024*1024);
 	if($memLimit < $recLimit)
 	{
-		$errors[] = "Memory Limit: {$recLimit}M is required. Please ask your host to increase this setting.";
+		$errors[] = "Memory Limit: ".(int)($recLimit/(1024*1024))."M is required. Please ask your host to increase this setting.";
 	}
 
 }

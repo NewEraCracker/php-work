@@ -150,7 +150,7 @@ if( extension_loaded('suhosin') )
 
 	foreach($test_false as $test)
 	{
-		if( ini_get($test) != false )
+		if( @ini_get($test) != false )
 		{
 			$errors[] = "{$test} being off in php.ini is required. Your host does not meet this requirement.";
 		}
@@ -160,7 +160,7 @@ if( extension_loaded('suhosin') )
 	{
 		if( isset($test['0']) && isset($test['1']) )
 		{
-			if( ini_get($test['0']) < $test['1'])
+			if( @ini_get($test['0']) < $test['1'])
 			{
 				$errors[] = "It is required that <b>{$test['0']}</b> is set to <b>{$test['1']}</b> or higher.";
 			}

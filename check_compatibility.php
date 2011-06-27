@@ -5,9 +5,9 @@
 	@version 0.3.1 Beta
 	@date    26/06/2011
 	@license Public Domain
-	
+
 	Inspired by all noobish hosting companies around the world
-	
+
 	Greetz to:
 	 - ForumScriptz Team
 	 - Matt Mecham
@@ -54,41 +54,42 @@ if( @ini_get('safe_mode') )
 // Check PHP extensions
 $required_extensions = array(
 
-array( 'prettyname'     => "Ctype",
-	   'extensionname'	=> "ctype" ),
+array(	'prettyname'		=> "Ctype",
+		'extensionname'	=> "ctype" ),
 
-array( 'prettyname'		=> "Document Object Model",
-	   'extensionname'	=> "dom" ),
-	   
-array( 'prettyname'		=> "Iconv",
-	   'extensionname'	=> "iconv" ),
+array(	'prettyname'		=> "Document Object Model",
+		'extensionname'	=> "dom" ),
 
-array( 'prettyname'		=> "GD Library",
-	   'extensionname'	=> "gd" ),
+array(	'prettyname'		=> "Iconv",
+		'extensionname'	=> "iconv" ),
 
-array( 'prettyname'		=> "MySQL",
-	   'extensionname'	=> "mysql" ),
+array(	'prettyname'		=> "GD Library",
+		'extensionname'	=> "gd" ),
 
-array( 'prettyname'		=> "MySQLi",
-	   'extensionname'	=> "mysqli" ),
-	   
-array( 'prettyname'		=> "Perl-Compatible Regular Expressions",
-	   'extensionname'	=> "pcre" ),
+array(	'prettyname'		=> "MySQL",
+		'extensionname'	=> "mysql" ),
 
-array( 'prettyname'		=> "Reflection Class",
-	   'extensionname'	=> "reflection" ),
-	   
-array( 'prettyname'		=> "XML Parser",
-	   'extensionname'	=> "xml" ),
+array(	'prettyname'		=> "MySQLi",
+		'extensionname'	=> "mysqli" ),
 
-array( 'prettyname'		=> "SPL",
-	   'extensionname'	=> "spl" ),
-	   
-array( 'prettyname'		=> "OpenSSL",
-	   'extensionname'	=> "openssl" ),
-	   
-array( 'prettyname'		=> "JSON",
-	   'extensionname'	=> "json" ),
+array(	'prettyname'		=> "Perl-Compatible Regular Expressions",
+		'extensionname'	=> "pcre" ),
+
+array(	'prettyname'		=> "Reflection Class",
+		'extensionname'	=> "reflection" ),
+
+array(	'prettyname'		=> "XML Parser",
+		'extensionname'	=> "xml" ),
+
+array(	'prettyname'		=> "SPL",
+		'extensionname'	=> "spl" ),
+
+array(	'prettyname'		=> "OpenSSL",
+		'extensionname'	=> "openssl" ),
+
+array(	'prettyname'		=> "JSON",
+		'extensionname'	=> "json" ),
+
 );
 
 foreach( $required_extensions as $test )
@@ -112,7 +113,7 @@ if( $memLimit = @ini_get('memory_limit') )
 		case 'k':
 			$memLimit *= 1024;
 	}
-	
+
 	$recLimit = (128*1024*1024);
 	if($memLimit < $recLimit)
 	{
@@ -146,7 +147,7 @@ if( extension_loaded('suhosin') )
 	'suhosin.cookie.encrypt',
 	'suhosin.session.encrypt',
 	);
-	
+
 	foreach($test_false as $test)
 	{
 		if( ini_get($test) != false )
@@ -154,7 +155,7 @@ if( extension_loaded('suhosin') )
 			$errors[] = "{$test} being off in php.ini is required. Your host does not meet this requirement.";
 		}
 	}
-	
+
 	foreach($test_values as $test)
 	{
 		if( isset($test['0']) && isset($test['1']) )

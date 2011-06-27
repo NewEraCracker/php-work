@@ -42,11 +42,11 @@ unset($test);
 // dl (in)security
 if (function_exists('dl') && !(in_array('dl', explode(', ', ini_get('disable_functions')))))
 {
-		if (ini_get('enable_dl'))
-		{
-			$noobishPointz++;
-			$issues .= "Issue: enable_dl should be Off!".$crlf;
-		}
+	if (ini_get('enable_dl'))
+	{
+		$noobishPointz++;
+		$issues .= "Issue: enable_dl should be Off!".$crlf;
+	}
 }
 
 // safe_mode?

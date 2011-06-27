@@ -100,7 +100,7 @@ function ipRangeCalculate($ip,$range)
 {
 	$ip_address = (string)  @$ip;
 	$ip_range   = (integer) @$range;
-	
+
 	if($ip_address != $ip || $ip_range != $range)
 	{
 		// We got wrong types of information

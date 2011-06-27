@@ -2,8 +2,8 @@
 /* 
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.4.0 RC
-	@date    26/06/2011
+	@version 0.5.0
+	@date    27/06/2011
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -13,6 +13,74 @@
 	 - Matt Mecham
 	 - Xenforo Developers
 */
+
+/* -------------
+   Configuration
+   ------------- */
+
+$mysqlHostname = '127.0.0.1';
+$mysqlPortnum  = '3306';
+$mysqlUsername = '';
+$mysqlPassword = '';
+$mysqlEnabled  = true;
+
+/* ---------
+   Functions
+   --------- */
+
+function improvedIntVal($value)
+{
+	$value = (string)$value;
+	$new   = "";
+	$found = false;
+
+	// Build
+	for( $i=0; $i<strlen($value); $i++ )
+	{	
+		// Found a number ?		
+		if( is_numeric($value[$i]) )
+		{
+			$found = true;
+			$new .= $value[$i];
+		}
+		elseif($found)
+		{
+			// We already have numbers
+			// and we don't like trash.
+			break;
+		}
+	}
+	$value = $new;
+	
+	// Return the result
+	return (int)$value;
+}
+
+function mySqlVersionStringToInt($version)
+{
+	$version = explode('.',$version);
+	$version = array_map("improvedIntVal",$version);
+	$version = $version[0]*10000 + $version[1]*100 + $version[2];
+	return $version;
+}
+
+function mySqlVersionIntToString($version)
+{
+	$version_remain = (int)($version);
+
+	// Major  [?.x.x]
+	$version_major  = (int)($version_remain/10000) ;
+	$version_remain = (int)($version_remain-($version_major*10000));
+
+	// Medium [x.?.x]
+	$version_medium = (int)($version_remain/100);
+	$version_remain = (int)($version_remain-($version_medium*100));
+
+	// Lower  [x.x.?]
+	$version_lower  = (int)($version_remain);
+
+	return "{$version_major}.{$version_medium}.{$version_lower}";
+}
 
 /* -----------
    PHP Version
@@ -37,10 +105,12 @@ if( version_compare($phpVersion, '5.3', '>=') && version_compare($phpVersion, '5
    ------------ */
 
 // Functions to be enabled
+$disabledFunctions    = array_map("trim", explode(",",@ini_get("disable_functions")));
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
+
 foreach( $functionsToBeEnabled as $test )
 {
-	if (!function_exists($test) || in_array($test, explode(', ', @ini_get('disable_functions'))))
+	if (!function_exists($test) || in_array($test, $disabledFunctions))
 	{
 		$errors[] = "Function ".$test." is required to be enabled in PHP!";
 	}
@@ -175,6 +245,78 @@ if( extension_loaded('suhosin') )
 	}
 }
 
+/* -------------
+   MySQL Version
+   ------------- */
+if( $mysqlEnabled )
+{
+	// Just to be sure :)
+	$mysqlPortnum = (int)$mysqlPortnum;
+
+	if( function_exists('mysqli_connect') )
+	{
+		$mysqli = @mysqli_connect($mysqlHostname,$mysqlUsername,$mysqlPassword,"",$mysqlPortnum);
+
+		if(!$mysqli)
+		{
+			$errors[] = "Unable to connect to MySQLi: ".mysqli_connect_error();
+		}
+		else
+		{
+			$client_version = mySqlVersionStringToInt( mysqli_get_client_info() );
+			$server_version = mySqlVersionStringToInt( mysqli_get_server_info($mysqli) );
+			
+			if($server_version < 50000)
+			{
+				$errors[] = "Your MySQL Version (".mySqlVersionIntToString($server_version).") is end-of-life. Please ask your host to upgrade MySQL!";
+			}
+			elseif($server_version < 50100)
+			{
+				$errors[] = "You are running MySQL ".mySqlVersionIntToString($server_version).", please ask your host to upgrade to MySQL 5.1!";
+			}
+			if( ($server_version-$client_version)>=1000 )
+			{
+				$errors[] = "Your PHP MySQL library version (".mySqlVersionIntToString($client_version).") does not match MySQL Server version (".mySqlVersionIntToString($server_version).")! Please ask your host to fix this issue";
+			}
+
+			mysqli_close($mysqli);
+		}
+	}
+	elseif( function_exists('mysql_connect') )
+	{
+		$mysqlHostname = "{$mysqlHostname}:{$mysqlPortnum}";
+		$mysql = @mysql_connect($mysqlHostname,$mysqlUsername,$mysqlPassword);
+
+		if(!$mysql)
+		{
+			$errors[] = "Unable to connect to MySQL: ".mysql_error();
+		}
+		else
+		{
+			$client_api = mySqlVersionStringToInt( mysql_get_client_info() );
+			$server_api = mySqlVersionStringToInt( mysql_get_server_info($mysql) );
+			
+			if($server_version < 50000)
+			{
+				$errors[] = "Your MySQL Version (".mySqlVersionIntToString($server_version).") is end-of-life. Please ask your host to upgrade MySQL!";
+			}
+			elseif($server_version < 50100)
+			{
+				$errors[] = "You are running MySQL ".mySqlVersionIntToString($server_version).", please ask your host to upgrade to MySQL 5.1!";
+			}
+			if( ($server_version-$client_version)>=1000 )
+			{
+				$errors[] = "Your PHP MySQL library version (".mySqlVersionIntToString($client_version).") does not match MySQL Server version (".mySqlVersionIntToString($server_version).")! Please ask your host to fix this issue";
+			}
+
+			mysql_close($mysql);
+		}
+	}
+}
+
+/* ---------------------
+   Output problems found
+   --------------------- */
 echo "<pre>";
 // Errors ?
 if( isset($errors) && count($errors) )

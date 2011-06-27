@@ -1,8 +1,8 @@
 <?php
-/* 
+/*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.5.1
+	@version 0.5.2
 	@date    27/06/2011
 	@license Public Domain
 
@@ -36,8 +36,8 @@ function improvedIntVal($value)
 
 	// Build
 	for( $i=0; $i<strlen($value); $i++ )
-	{	
-		// Found a number ?		
+	{
+		// Found a number ?
 		if( is_numeric($value[$i]) )
 		{
 			$found = true;
@@ -51,7 +51,7 @@ function improvedIntVal($value)
 		}
 	}
 	$value = $new;
-	
+
 	// Return the result
 	return (int)$value;
 }
@@ -81,7 +81,7 @@ function mySqlVersionIntToString($version)
 
 	return "{$version_major}.{$version_medium}.{$version_lower}";
 }
-   
+
 /* -----------
    PHP Version
    ----------- */
@@ -264,8 +264,8 @@ if( $mysqlEnabled )
 			$client_version = mySqlVersionStringToInt( mysqli_get_client_info() );
 			$server_version = mySqlVersionStringToInt( mysqli_get_server_info($mysqli) );
 			mysqli_close($mysqli);
-		}		
-	}		
+		}
+	}
 	elseif( function_exists('mysql_connect') )
 	{
 		$mysqlHostname = "{$mysqlHostname}:{$mysqlPortnum}";
@@ -277,8 +277,8 @@ if( $mysqlEnabled )
 		}
 		else
 		{
-			$client_api = mySqlVersionStringToInt( mysql_get_client_info() );
-			$server_api = mySqlVersionStringToInt( mysql_get_server_info($mysql) );
+			$client_version = mySqlVersionStringToInt( mysql_get_client_info() );
+			$server_version = mySqlVersionStringToInt( mysql_get_server_info($mysql) );
 			mysql_close($mysql);
 		}
 	}

@@ -1,14 +1,14 @@
 <?php
-/**
-* Suhosin Configuration Checker v0.4
-* @author NewEraCracker
-* @date 24-02-2011
-* @license Public Domain
+/*
+	Suhosin Configuration Checker v0.5
+	@author  NewEraCracker
+	@date    30/06/2011
+	@license Public Domain
 */
 
-//
-// Configuration
-//
+/* -------------
+   Configuration
+   ------------- */
 
 // Value has to be the same or higher to pass tests
 $test_values = array(
@@ -31,23 +31,25 @@ $test_false = array(
 'suhosin.session.encrypt',
 );
 
-//
-// Main code
-//
+/* ---------
+   Main code
+   --------- */
 
-ob_start();
+$informations = $problems = array();
 
-if( extension_loaded('suhosin') )
+if( !extension_loaded('suhosin') )
 {
-	$problems = 0;
-	echo "<b>Suhosin installation detected!</b>".PHP_EOL;
+	$informations[] = "<b>There is no Suhosin in here :)</b>";
+}
+else
+{
+	$informations[] = "<b>Suhosin installation detected!</b>";
 
 	foreach($test_false as $test)
 	{
 		if( ini_get($test) != false )
 		{
-			echo "Please ask your host to <b>disable (turn off) {$test}</b> in php.ini".PHP_EOL;
-			$problems++;
+			$problems[] = "Please ask your host to <b>disable (turn off) {$test}</b> in php.ini.";
 		}
 	}
 	foreach($test_values as $test)
@@ -56,26 +58,26 @@ if( extension_loaded('suhosin') )
 		{
 			if( ini_get($test['0']) < $test['1'])
 			{
-				echo "Please ask your host to set <b>{$test['0']}</b> in php.ini to <b>{$test['1']}</b> or higher".PHP_EOL;
-				$problems++;
+				$problems[] = "Please ask your host to set <b>{$test['0']}</b> in php.ini to <b>{$test['1']}</b> or higher.";
 			}
 		}
 	}
-	if($problems == 0)
+	if( !count($problems) )
 	{
-		echo "<b>No problems detected!</b>".PHP_EOL;
+		$informations[] = "<b>No problems detected!</b>";
 	}
 }
-else
+
+echo "<pre>";
+foreach($information as $info)
 {
-	echo "<b>There is no Suhosin in here :)</b>".PHP_EOL;
+	echo $info."\r\n";
 }
 
-$output = ob_get_contents();
-ob_end_clean();
-
-$output = str_replace(PHP_EOL, PHP_EOL.PHP_EOL ,$output);
-$output = nl2br($output);
-echo $output;
+foreach($problems as $problem)
+{
+	echo $problem."\r\n";
+}
+echo "</pre>";
 
 ?>

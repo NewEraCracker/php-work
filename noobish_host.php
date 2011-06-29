@@ -1,20 +1,20 @@
 <?php
-/* iS MA HOS' NOOBISH? v2.5.1
- * @author   NewEraCracker
- * @date     22-03-2011
- * @license  Public Domain
- * @notes    newfags can't triforce
- */
+/* 
+	iS MA HOS' NOOBISH? v2.5.2
+	@author   NewEraCracker
+	@date     30/06/2011
+	@license  Public Domain
+	@notes    newfags can't triforce
+*/
 
 // config
 $functionsToBeDisabled = array('link', 'symlink', 'system', 'shell_exec', 'passthru', 'exec', 'pcntl_exec', 'popen', 'proc_close', 'proc_get_status', 'proc_nice', 'proc_open', 'proc_terminate');
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set');
 
 // init
-header('Content-Type: text/plain');
 error_reporting(0);
 $crlf = "\r\n";
-$issues = '';
+$issues = "";
 $noobishPointz = 0;
 
 // functions to be disabled
@@ -56,6 +56,7 @@ if (ini_get('safe_mode')) { $noobishPointz++; $issues .= "Issue: safe_mode is On
 if (ini_get('magic_quotes_gpc')) { $noobishPointz++; $issues .= "Issue: magic_quotes_gpc is On!"; }
 
 // output results
+echo "<pre>";
 if ($noobishPointz==0)
 {
 	echo('Host is not noobish! Ready for use!'.$crlf);
@@ -64,4 +65,5 @@ else
 {
 	echo('Your host scored '.$noobishPointz.' noobish points!'.$crlf.$crlf.$issues); 
 }
+echo "</pre>";
 ?>

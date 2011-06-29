@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.5.4
-	@date    27/06/2011
+	@version 0.5.5
+	@date    30/06/2011
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -228,7 +228,7 @@ if( extension_loaded('suhosin') )
 	{
 		if( @ini_get($test) != false )
 		{
-			$errors[] = "{$test} being off in php.ini is required. Your host does not meet this requirement.";
+			$errors[] = "{$test} is required to be set to <b>off</b> in php.ini. Your host does not meet this requirement.";
 		}
 	}
 	foreach($test_values as $test)

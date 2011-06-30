@@ -1,6 +1,6 @@
 <?php
 /* 
-	iS MA HOS' NOOBISH? v2.5.2
+	iS MA HOS' NOOBISH? v2.5.3
 	@author   NewEraCracker
 	@date     30/06/2011
 	@license  Public Domain

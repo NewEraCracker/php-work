@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.5.5
+	@version 0.5.6
 	@date    30/06/2011
 	@license Public Domain
 
@@ -106,13 +106,19 @@ if( version_compare($phpVersion, '5.3', '>=') && version_compare($phpVersion, '5
 
 // Functions to be enabled
 $disabledFunctions    = array_map("trim", explode(",",@ini_get("disable_functions")));
-$functionsToBeEnabled = array('php_uname', 'base64_decode', 'eval', 'fpassthru', 'ini_set', 'ini_get');
+$functionsToBeEnabled = array("php_uname", "base64_decode", "fpassthru", "ini_set", "ini_get");
 foreach( $functionsToBeEnabled as $test )
 {
 	if (!function_exists($test) || in_array($test, $disabledFunctions))
 	{
 		$errors[] = "Function ".$test." is required to be enabled in PHP!";
 	}
+}
+
+// Do we have access to eval?
+if ( in_array("eval", $disabledFunctions) )
+{
+	$errors[] = "Language construct eval is required to be enabled in PHP!";
 }
 
 // Magic Quotes

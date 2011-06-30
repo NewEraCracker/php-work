@@ -1,6 +1,6 @@
 <?php
 /*
-	Suhosin Configuration Checker v0.5
+	Suhosin Configuration Checker v0.5.1
 	@author  NewEraCracker
 	@date    30/06/2011
 	@license Public Domain
@@ -69,7 +69,7 @@ else
 }
 
 echo "<pre>";
-foreach($information as $info)
+foreach($informations as $info)
 {
 	echo $info."\r\n";
 }

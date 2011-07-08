@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.5.6
-	@date    30/06/2011
+	@version 0.5.7
+	@date    2011/07/08
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -88,10 +88,10 @@ function mySqlVersionIntToString($version)
 
 $phpVersion = phpversion();
 
-// Check for lower than 5.2.4
-if( version_compare($phpVersion, '5.2.4', '<') )
+// Check for lower than 5.2.8
+if( version_compare($phpVersion, '5.2.8', '<') )
 {
-	$errors[] = "PHP 5.2.4 or newer is required. {$phpVersion} does not meet this requirement.";
+	$errors[] = "PHP 5.2.8 or newer is required. {$phpVersion} does not meet this requirement.";
 }
 
 // If 5.3, check for lower than 5.3.4

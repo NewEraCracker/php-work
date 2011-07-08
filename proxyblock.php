@@ -1,18 +1,19 @@
 <?php
-/*---------------------
- * Proxy Block Script
- *---------------------
- *
- * Created by NewEraCracker
- * Date...: 12-04-2011
- * Version: 1.0.3
- *
- * Requirements:
- * = PHP 5.2 or higher
- * = MySQL 5 or higher
- *
- * License: CC BY-SA 3.0
- */
+/*
+	--------------------
+	Proxy Block Script
+	--------------------
+
+	Created by NewEraCracker
+	Date    2011/07/08
+	Version 1.0.4
+
+	Requirements:
+	= PHP 5.2 or higher
+	= MySQL 5 or higher
+
+	License: CC BY-SA 3.0
+*/
 
 function check_proxy()
 {

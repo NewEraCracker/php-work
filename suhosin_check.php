@@ -1,8 +1,8 @@
 <?php
 /*
-	Suhosin Configuration Checker v0.5.1
+	Suhosin Configuration Checker v0.5.2
 	@author  NewEraCracker
-	@date    30/06/2011
+	@date    2011/07/08
 	@license Public Domain
 */
 

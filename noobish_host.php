@@ -1,8 +1,8 @@
 <?php
 /* 
-	iS MA HOS' NOOBISH? v2.5.3
+	iS MA HOS' NOOBISH? v2.5.4
 	@author   NewEraCracker
-	@date     30/06/2011
+	@date     2011/07/08
 	@license  Public Domain
 	@notes    newfags can't triforce
 */

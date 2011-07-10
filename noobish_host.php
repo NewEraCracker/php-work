@@ -1,69 +1,77 @@
 <?php
 /* 
-	iS MA HOS' NOOBISH? v2.5.4
+	iS MA HOS' NOOBISH? v2.5.5
 	@author   NewEraCracker
-	@date     2011/07/08
+	@date     2011/07/10
 	@license  Public Domain
 	@notes    newfags can't triforce
 */
 
-// config
+// Config
 $functionsToBeDisabled = array('link', 'symlink', 'system', 'shell_exec', 'passthru', 'exec', 'pcntl_exec', 'popen', 'proc_close', 'proc_get_status', 'proc_nice', 'proc_open', 'proc_terminate');
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set');
 
-// init
-error_reporting(0);
+// Init
 $crlf = "\r\n";
-$issues = "";
-$noobishPointz = 0;
+$disabledFunctions = array_map("trim", explode(",",@ini_get("disable_functions")));
+$issues = array();
 
-// functions to be disabled
+// Functions to be disabled
 foreach ($functionsToBeDisabled as $test)
 {
-	if (function_exists($test) && !(in_array($test, explode(', ', ini_get('disable_functions')))))
+	if(function_exists($test) && !(in_array($test, $disabledFunctions)))
 	{
-		$noobishPointz++;
-		$issues .= "Issue: Function ".$test." should be disabled!".$crlf;
+		$issues[] = "Function ".$test." should be disabled!";
 	}
 }
 unset($test);
 
-// functions to be enabled
+// Functions to be enabled
 foreach ($functionsToBeEnabled as $test)
 {
-	if (!function_exists($test) || in_array($test, explode(', ', ini_get('disable_functions'))))
+	if(!function_exists($test) || in_array($test, $disabledFunctions))
 	{
-		$noobishPointz++;
-		$issues .= "Issue: Function ".$test." should be enabled!".$crlf;
+		$issues[] = "Function ".$test." should be enabled!";
 	}
 }
 unset($test);
 
+// Do we have access to eval?
+if( in_array("eval", $disabledFunctions) )
+{
+	$issues[] = "Language construct eval is required to be enabled in PHP!";
+}
+
 // dl (in)security
-if (function_exists('dl') && !(in_array('dl', explode(', ', ini_get('disable_functions')))))
+if( function_exists('dl') && !(in_array('dl', $disabledFunctions)) )
 {
 	if (ini_get('enable_dl'))
 	{
-		$noobishPointz++;
-		$issues .= "Issue: enable_dl should be Off!".$crlf;
+		$issues[] = "enable_dl should be Off!";
 	}
 }
 
-// safe_mode?
-if (ini_get('safe_mode')) { $noobishPointz++; $issues .= "Issue: safe_mode is On!".$crlf;}
+// Safe mode?
+if (ini_get('safe_mode')) { $issues[] = "Issue: safe_mode is On!"; }
 
 // magic_quotes_gpc?
-if (ini_get('magic_quotes_gpc')) { $noobishPointz++; $issues .= "Issue: magic_quotes_gpc is On!"; }
+if (ini_get('magic_quotes_gpc')) { $issues[] = "Issue: magic_quotes_gpc is On!"; }
 
-// output results
+// Output results
 echo "<pre>";
-if ($noobishPointz==0)
+if( !count($issues) )
 {
-	echo('Host is not noobish! Ready for use!'.$crlf);
+	echo "Host is not noobish! Ready for use!";
 }
 else
 {
-	echo('Your host scored '.$noobishPointz.' noobish points!'.$crlf.$crlf.$issues); 
+	echo "Your host scored ".count($issues)." noobish points!".$crlf.$crlf;
+
+	foreach($issues as $issue)
+	{
+		echo "Issue: {$issue}".$crlf;
+	}
+	unset($issue);
 }
 echo "</pre>";
 ?>

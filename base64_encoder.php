@@ -2,7 +2,7 @@
 // Author: NewEraCracker
 // License: Public Domain
 ?>
-SiMPLE PHP ENCODER BY NEWERACRACKER [v0.0.6]<br/>
+SiMPLE PHP ENCODER BY NEWERACRACKER [v0.0.7]<br/>
 <br/>
 Encoding: base64_encode(gzdeflate($text,9));<br/>
 Decoding: gzinflate(base64_decode($text));<br/>
@@ -20,13 +20,13 @@ if (isset($_POST['text']) && isset($_POST['type']))
 
 	if ($_POST['type']=='encode')
 	{
-		$encoded = base64_encode(gzdeflate($text,9));
+		$encoded = @base64_encode(gzdeflate($text,9));
 		echo 'DECODED: <br/><textarea cols=100 rows=5>'.htmlspecialchars($text).'</textarea><br/>';
 		echo 'ENCODED: <br/><textarea cols=100 rows=5>'.htmlspecialchars($encoded).'</textarea><br/>';
 	}
 	elseif ($_POST['type']=='decode')
 	{
-		$decoded = gzinflate(base64_decode($text));
+		$decoded = @gzinflate(base64_decode($text));
 		echo 'ENCODED: <br/><textarea cols=100 rows=5>'.htmlspecialchars($text).'</textarea><br/>';
 		echo 'DECODED: <br/><textarea cols=100 rows=5>'.htmlspecialchars($decoded).'</textarea><br/>';
 	}

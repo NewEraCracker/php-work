@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.5.9
-	@date    2011/07/10
+	@version 0.6.0
+	@date    2011/07/20
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -59,7 +59,7 @@ function improvedIntVal($value)
 function mySqlVersionStringToInt($version)
 {
 	$version = explode('.',$version);
-	$version = array_map("improvedIntVal",$version);
+	$version = array_map('improvedIntVal',$version);
 	$version = $version[0]*10000 + $version[1]*100 + $version[2];
 	return $version;
 }
@@ -105,18 +105,18 @@ if( version_compare($phpVersion, '5.3', '>=') && version_compare($phpVersion, '5
    ------------ */
 
 // Functions to be enabled
-$disabledFunctions    = array_map("trim", explode(",",@ini_get("disable_functions")));
-$functionsToBeEnabled = array("php_uname", "base64_decode", "fpassthru", "ini_set", "ini_get");
+$disabledFunctions    = array_map('trim', explode(',',@ini_get('disable_functions')));
+$functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
 foreach( $functionsToBeEnabled as $test )
 {
 	if (!function_exists($test) || in_array($test, $disabledFunctions))
 	{
-		$errors[] = "Function ".$test." is required to be enabled in PHP!";
+		$errors[] = "Function {$test} is required to be enabled in PHP!";
 	}
 }
 
 // Do we have access to eval?
-if ( in_array("eval", $disabledFunctions) )
+if ( in_array('eval', $disabledFunctions) )
 {
 	$errors[] = "Language construct eval is required to be enabled in PHP!";
 }
@@ -135,50 +135,43 @@ if( @ini_get('safe_mode') )
 
 // Check PHP extensions
 $required_extensions = array(
-
-array(	'prettyname'		=> "Ctype",
-		'extensionname'	=> "ctype" ),
-
-array(	'prettyname'		=> "Document Object Model",
-		'extensionname'	=> "dom" ),
-
-array(	'prettyname'		=> "Iconv",
-		'extensionname'	=> "iconv" ),
-
-array(	'prettyname'		=> "GD Library",
-		'extensionname'	=> "gd" ),
-
-array(	'prettyname'		=> "MySQL",
-		'extensionname'	=> "mysql" ),
-
-array(	'prettyname'		=> "MySQLi",
-		'extensionname'	=> "mysqli" ),
-
-array(	'prettyname'		=> "Perl-Compatible Regular Expressions",
-		'extensionname'	=> "pcre" ),
-
-array(	'prettyname'		=> "Reflection Class",
-		'extensionname'	=> "reflection" ),
-
-array(	'prettyname'		=> "XML Parser",
-		'extensionname'	=> "xml" ),
-
-array(	'prettyname'		=> "SPL",
-		'extensionname'	=> "spl" ),
-
-array(	'prettyname'		=> "OpenSSL",
-		'extensionname'	=> "openssl" ),
-
-array(	'prettyname'		=> "JSON",
-		'extensionname'	=> "json" ),
-
+	array( 'ctype', 'Ctype' ),
+	array( 'curl', 'cURL' ),
+	array( 'dom', 'Document Object Model' ),
+	array( 'iconv', 'Iconv' ),
+	array( 'gd', 'GD Library' ),
+	array( 'mysql', 'MySQL'  ),
+	array( 'mysqli', 'MySQLi' ),
+	array( 'pcre', 'Perl-Compatible Regular Expressions' ),
+	array( 'reflection', 'Reflection Class' ),
+	array( 'xml', 'XML Parser' ),
+	array( 'spl', 'SPL' ),
+	array( 'openssl', 'OpenSSL'  ),
+	array( 'json', 'JSON' ),
 );
 
 foreach( $required_extensions as $test )
 {
-	if ( !extension_loaded($test['extensionname']) )
+	if ( !extension_loaded($test[0]) )
 	{
-		$errors[] = "The required PHP extension \"{$test['prettyname']}\" could not be found. Please ask your host to install this extension.";
+		$errors[] = "The required PHP extension \"{$test[1]}\" could not be found. Please ask your host to install this extension.";
+	}
+}
+
+// Check GD
+if( function_exists('gd_info') )
+{
+	$required_gd = array(
+		array( 'imagecreatefromjpeg', 'JPEG' ),
+		array( 'imagecreatefrompng',  'PNG'  ),
+	);
+
+	foreach( $required_gd as $test )
+	{
+		if( !function_exists($test[0]) )
+		{
+			$errors[] = "The required PHP extension \"GD Library\" was found, but {$test[1]} support is missing. Please ask your host to add support for {$test[1]} images.";
+		}
 	}
 }
 
@@ -259,7 +252,7 @@ if( $mysqlEnabled )
 
 	if( function_exists('mysqli_connect') )
 	{
-		$mysqli = @mysqli_connect($mysqlHostname,$mysqlUsername,$mysqlPassword,"",$mysqlPortnum);
+		$mysqli = @mysqli_connect($mysqlHostname,$mysqlUsername,$mysqlPassword,'',$mysqlPortnum);
 
 		if(!$mysqli)
 		{

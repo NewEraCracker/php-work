@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.6.1
+	@version 0.6.2
 	@date    2011/07/22
 	@license Public Domain
 
@@ -166,7 +166,7 @@ if( function_exists('curl_version') )
 	$curlBitFields = array( 'CURL_VERSION_SSL', 'CURL_VERSION_LIBZ' );
 	$curlBitFriendly = array( 'SSL', 'ZLIB' );
 
-	foreach($curlBitfields as $arr_key => $feature)
+	foreach($curlBitFields as $arr_key => $feature)
 	{
 		if( !($curlVersion['features'] && constant($feature)) )
 		{

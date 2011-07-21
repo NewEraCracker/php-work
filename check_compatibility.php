@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.6.0
-	@date    2011/07/20
+	@version 0.6.1
+	@date    2011/07/22
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -18,11 +18,11 @@
    Configuration
    ------------- */
 
+$mysqlEnabled  = true;
 $mysqlHostname = '127.0.0.1';
 $mysqlPortnum  = '3306';
 $mysqlUsername = '';
 $mysqlPassword = '';
-$mysqlEnabled  = true;
 
 /* ---------
    Functions
@@ -88,10 +88,10 @@ function mySqlVersionIntToString($version)
 
 $phpVersion = phpversion();
 
-// Check for lower than 5.2.8
-if( version_compare($phpVersion, '5.2.8', '<') )
+// Check for lower than 5.2.9
+if( version_compare($phpVersion, '5.2.9', '<') )
 {
-	$errors[] = "PHP 5.2.8 or newer is required. {$phpVersion} does not meet this requirement.";
+	$errors[] = "PHP 5.2.9 or newer is required. {$phpVersion} does not meet this requirement.";
 }
 
 // If 5.3, check for lower than 5.3.5
@@ -140,14 +140,14 @@ $required_extensions = array(
 	array( 'dom', 'Document Object Model' ),
 	array( 'iconv', 'Iconv' ),
 	array( 'gd', 'GD Library' ),
+	array( 'json', 'JSON' ),
 	array( 'mysql', 'MySQL'  ),
 	array( 'mysqli', 'MySQLi' ),
+	array( 'openssl', 'OpenSSL'  ),
 	array( 'pcre', 'Perl-Compatible Regular Expressions' ),
 	array( 'reflection', 'Reflection Class' ),
-	array( 'xml', 'XML Parser' ),
 	array( 'spl', 'SPL' ),
-	array( 'openssl', 'OpenSSL'  ),
-	array( 'json', 'JSON' ),
+	array( 'xml', 'XML Parser' ),
 );
 
 foreach( $required_extensions as $test )
@@ -158,12 +158,32 @@ foreach( $required_extensions as $test )
 	}
 }
 
+// Check cURL
+if( function_exists('curl_version') )
+{
+	// We need SSL and ZLIB support
+	$curlVersion = curl_version();
+	$curlBitFields = array( 'CURL_VERSION_SSL', 'CURL_VERSION_LIBZ' );
+	$curlBitFriendly = array( 'SSL', 'ZLIB' );
+
+	foreach($curlBitfields as $arr_key => $feature)
+	{
+		if( !($curlVersion['features'] && constant($feature)) )
+		{
+			$test = $curlBitFriendly[$arr_key];
+			$errors[] = "The required PHP extension \"cURL\" was found, but {$test} support is missing. Please ask your host to add support for {$test} in cURL.";
+		}
+	}
+}
+
 // Check GD
 if( function_exists('gd_info') )
 {
+	// We need GIF, JPEG and PNG support
 	$required_gd = array(
+		array( 'imagecreatefromgif', 'GIF' ),
 		array( 'imagecreatefromjpeg', 'JPEG' ),
-		array( 'imagecreatefrompng',  'PNG'  ),
+		array( 'imagecreatefrompng', 'PNG' ),
 	);
 
 	foreach( $required_gd as $test )

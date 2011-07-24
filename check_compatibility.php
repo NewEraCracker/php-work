@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.6.2
-	@date    2011/07/22
+	@version 0.6.3
+	@date    2011/07/24
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -86,18 +86,16 @@ function mySqlVersionIntToString($version)
    PHP Version
    ----------- */
 
-$phpVersion = phpversion();
-
 // Check for lower than 5.2.9
-if( version_compare($phpVersion, '5.2.9', '<') )
+if( version_compare(PHP_VERSION, '5.2.9', '<') )
 {
-	$errors[] = "PHP 5.2.9 or newer is required. {$phpVersion} does not meet this requirement.";
+	$errors[] = "PHP 5.2.9 or newer is required. ".PHP_VERSION." does not meet this requirement.";
 }
 
 // If 5.3, check for lower than 5.3.5
-if( version_compare($phpVersion, '5.3', '>=') && version_compare($phpVersion, '5.3.5', '<') )
+if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare($phpVersion, '5.3.5', '<') )
 {
-	$errors[] = "PHP 5.3.5 or newer is required. {$phpVersion} does not meet this requirement.";
+	$errors[] = "PHP 5.3.5 or newer is required. ".PHP_VERSION." does not meet this requirement.";
 }
 
 /* ------------
@@ -141,6 +139,7 @@ $required_extensions = array(
 	array( 'iconv', 'Iconv' ),
 	array( 'gd', 'GD Library' ),
 	array( 'json', 'JSON' ),
+	array( 'mbstring', 'Multibyte String' ),
 	array( 'mysql', 'MySQL'  ),
 	array( 'mysqli', 'MySQLi' ),
 	array( 'openssl', 'OpenSSL'  ),

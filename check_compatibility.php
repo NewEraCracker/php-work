@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board (and other scripts)
 	@author  NewEraCracker
-	@version 0.6.3
+	@version 0.6.4
 	@date    2011/07/24
 	@license Public Domain
 
@@ -93,7 +93,7 @@ if( version_compare(PHP_VERSION, '5.2.9', '<') )
 }
 
 // If 5.3, check for lower than 5.3.5
-if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare($phpVersion, '5.3.5', '<') )
+if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
 {
 	$errors[] = "PHP 5.3.5 or newer is required. ".PHP_VERSION." does not meet this requirement.";
 }

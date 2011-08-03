@@ -1,9 +1,9 @@
 <?php
 /*
-	Helps checking compatibility with IP.Board (and other scripts)
+	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.6.5
-	@date    2011/07/27
+	@version 0.6.6
+	@date    2011/08/03
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -147,6 +147,7 @@ $required_extensions = array(
 	array( 'reflection', 'Reflection Class' ),
 	array( 'spl', 'SPL' ),
 	array( 'xml', 'XML Parser' ),
+	array( 'zip', 'Zip' ),
 );
 
 foreach( $required_extensions as $test )

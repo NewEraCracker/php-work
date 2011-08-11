@@ -192,7 +192,6 @@ if( extension_loaded('curl') )
 			}
 		}
 	}
-	
 }
 
 // Check GD

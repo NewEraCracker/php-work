@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.6.7
+	@version 0.7.0
 	@date    2011/08/11
 	@license Public Domain
 
@@ -160,21 +160,39 @@ foreach( $required_extensions as $test )
 }
 
 // Check cURL
-if( function_exists('curl_version') )
+if( extension_loaded('curl') )
 {
-	// We need SSL and ZLIB support
-	$curlVersion = curl_version();
-	$curlBitFields = array( 'CURL_VERSION_SSL', 'CURL_VERSION_LIBZ' );
-	$curlBitFriendly = array( 'SSL', 'ZLIB' );
-
-	foreach($curlBitFields as $arr_key => $feature)
+	// Some fail hosts have cURL but disable its functions. Lets check for that.
+	$curlFuctions = array(
+		'curl_close', 'curl_copy_handle', 'curl_errno', 'curl_error', 'curl_exec', 'curl_getinfo',
+		'curl_init', 'curl_multi_add_handle', 'curl_multi_close', 'curl_multi_exec', 'curl_multi_getcontent',
+		'curl_multi_info_read', 'curl_multi_init', 'curl_multi_remove_handle', 'curl_multi_select',
+		'curl_setopt_array', 'curl_setopt', 'curl_version',
+		);
+	foreach( $curlFuctions as $test )
 	{
-		if( !($curlVersion['features'] && constant($feature)) )
+		if (!function_exists($test) || in_array($test, $disabledFunctions))
 		{
-			$test = $curlBitFriendly[$arr_key];
-			$errors[] = "The required PHP extension \"cURL\" was found, but {$test} support is missing. Please ask your host to add support for {$test} in cURL.";
+			$errors[] = "The required PHP extension \"cURL\" was found, but function {$test} is disabled, please ask your host to enable it!";
 		}
 	}
+
+	// We need SSL and ZLIB support
+	if( $curlVersion = @curl_version() )
+	{
+		$curlBitFields = array( 'CURL_VERSION_SSL', 'CURL_VERSION_LIBZ' );
+		$curlBitFriendly = array( 'SSL', 'ZLIB' );
+
+		foreach($curlBitFields as $arr_key => $feature)
+		{
+			if( !($curlVersion['features'] && constant($feature)) )
+			{
+				$test = $curlBitFriendly[$arr_key];
+				$errors[] = "The required PHP extension \"cURL\" was found, but {$test} support is missing. Please ask your host to add support for {$test} in cURL.";
+			}
+		}
+	}
+	
 }
 
 // Check GD

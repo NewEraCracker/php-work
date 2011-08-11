@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.6.6
-	@date    2011/08/03
+	@version 0.6.7
+	@date    2011/08/11
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -148,6 +148,7 @@ $required_extensions = array(
 	array( 'spl', 'SPL' ),
 	array( 'xml', 'XML Parser' ),
 	array( 'zip', 'Zip' ),
+	array( 'zlib', 'Zlib' ),
 );
 
 foreach( $required_extensions as $test )

@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.7.0
-	@date    2011/08/11
+	@version 0.7.1
+	@date    2011/08/12
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -103,7 +103,8 @@ if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5
    ------------ */
 
 // Functions to be enabled
-$disabledFunctions    = array_map('trim', explode(',',@ini_get('disable_functions')));
+$disabledFunctions    = array_map('trim', explode(',',@ini_get('disable_functions')) );
+$disabledFunctions    = array_merge($disabledFunctions, array_map('trim', explode(',',@ini_get('suhosin.executor.func.blacklist'))) );
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
 foreach( $functionsToBeEnabled as $test )
 {

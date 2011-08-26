@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.7.1
-	@date    2011/08/12
+	@version 0.7.2
+	@date    2011/08/26
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -212,7 +212,7 @@ if( function_exists('gd_info') )
 			$errors[] = "The required PHP extension \"GD Library\" was found, but {$test[1]} support is missing. Please ask your host to add support for {$test[1]} images.";
 		}
 	}
-	
+
 	// We need Freetype support
 	$gdInfo = gd_info();
 	if( @$gdInfo['FreeType Support'] == false )

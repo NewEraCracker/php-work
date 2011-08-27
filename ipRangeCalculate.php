@@ -182,7 +182,8 @@ function ipRangeCalculate( $ip, $range )
 	Calculates if a certain IP is within a certain IP range
 	=======================================================
 
-	It currently supports single IPs (x.x.x.x) and Ranges (x.x.x.x-y.y.y.y and x.x.x.x/n)
+	It currently supports single IPs (x.x.x.x),
+	ranges (x.x.x.x-y.y.y.y and x.x.x.x/n) and wildcards (x.x.x.*)
 
 	----
 
@@ -195,7 +196,8 @@ function ipRangeCalculate( $ip, $range )
 
 	----
 
-	Be aware this function also returns false in case of error, so you better validate the input ;)
+	Be aware this function also returns false in case of error,
+	so you better validate the input ;)
 */
 function isInIpRange( $ip, $range )
 {

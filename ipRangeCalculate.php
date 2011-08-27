@@ -306,15 +306,15 @@ function isInIpRange( $ip, $range )
 	   ------- */
 
 	// Compare IP to ranges extremes
-	if( $ipRangeHigher = $ip || $ipRangeLower = $ip )
+	if( $ipRangeHigher == $ip || $ipRangeLower == $ip )
 	{
 		// Thats the IP we are looking for
 		return true;
 	}
 
-	for( $i=0; $i<count($ip); $i++)
+	for( $i=0; $i<strlen($ip); $i++)
 	{
-		if( $ipRangeLower[$i] <= $ip[$i] && $ip[$i] <= $ipRangeHigher )
+		if( ord($ipRangeLower[$i]) <= ord($ip[$i]) && ord($ip[$i]) <= ord($ipRangeHigher) )
 		{
 			// This IP bit is into IP Range
 			continue;

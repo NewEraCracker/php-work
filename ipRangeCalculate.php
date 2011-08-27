@@ -128,7 +128,7 @@ function ipRangeCalculate( $ip, $range )
 	else
 	{
 		// Validate IP address
-		$ip_address = inet_ntop( inet_pton( $ip_address ) );
+		$ip_address = @inet_ntop( @inet_pton( $ip_address ) );
 
 		if( !$ip_address )
 		{
@@ -204,7 +204,7 @@ function isInIpRange( $ip, $range )
 	/* -------------------------
 	   Convert IP to packed form
 	   ------------------------- */
-	$ip = inet_pton( $ip );
+	$ip = @inet_pton( $ip );
 
 	if( !$ip )
 	{
@@ -271,7 +271,7 @@ function isInIpRange( $ip, $range )
 	else
 	{
 		// Validate
-		$range = inet_ntop( inet_pton( $range ) );
+		$range = @inet_ntop( @inet_pton( $range ) );
 
 		if( !$range )
 		{
@@ -295,7 +295,7 @@ function isInIpRange( $ip, $range )
 	   -------------- */
 
 	if( strlen($ipRangeHigher) != strlen($ipRangeLower)
-	|| stren($ipRangeLower) != strlen($ip) )
+	|| strlen($ipRangeLower) != strlen($ip) )
 	{
 		// This is not right
 		return false;

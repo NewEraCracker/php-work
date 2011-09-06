@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.8.0
+	@version 0.9.0
 	@date    2011/09/06
 	@license Public Domain
 
@@ -348,13 +348,24 @@ if( $mysqlEnabled )
 	}
 }
 
-/* ---------------------
-   Output problems found
-   --------------------- */
-echo "<pre>";
+/* ------
+   Output
+   ------ */
+
+// Header
+echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>check_compatibility.php</title>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<pre>';
+
+// Body
 if( isset($errors) && count($errors) )
 {
-	// We got errors :(
+	// Errors
 	foreach($errors as $error)
 	{
 		echo $error."\r\n";
@@ -365,4 +376,8 @@ else
 	// Balls to you!
 	echo "Congratulations, no problems have been detected.";
 }
-echo "</pre>";
+
+// Footer
+echo '</pre>
+</body>
+</html>';

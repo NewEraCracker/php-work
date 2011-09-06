@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.7.2
-	@date    2011/08/26
+	@version 0.8.0
+	@date    2011/09/06
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -250,23 +250,26 @@ if( extension_loaded('suhosin') )
 {
 	// Value has to be the same or higher to pass tests
 	$test_values = array(
-	array( 'suhosin.get.max_name_length', 350 ),
-	array( 'suhosin.post.max_array_index_length', 256 ),
-	array( 'suhosin.post.max_totalname_length', 8192 ),
-	array( 'suhosin.post.max_vars', 4096 ),
-	array( 'suhosin.post.max_value_length', 1000000 ),
-	array( 'suhosin.request.max_array_index_length', 256 ),
-	array( 'suhosin.request.max_totalname_length', 8192 ),
-	array( 'suhosin.request.max_vars', 4096 ),
-	array( 'suhosin.request.max_value_length', 1000000 ),
-	array( 'suhosin.request.max_varname_length', 350 ),
+		array( 'suhosin.get.max_name_length', 512 ),
+		array( 'suhosin.get.max_totalname_length', 512 ), 
+		array( 'suhosin.get.max_value_length', 1024 ), 
+		array( 'suhosin.post.max_array_index_length', 256 ),
+		array( 'suhosin.post.max_name_length', 512 ),
+		array( 'suhosin.post.max_totalname_length', 8192 ),
+		array( 'suhosin.post.max_vars', 4096 ),
+		array( 'suhosin.post.max_value_length', 1000000 ),
+		array( 'suhosin.request.max_array_index_length', 256 ),
+		array( 'suhosin.request.max_totalname_length', 8192 ),
+		array( 'suhosin.request.max_vars', 4096 ),
+		array( 'suhosin.request.max_value_length', 1000000 ),
+		array( 'suhosin.request.max_varname_length', 512 ),
 	);
 
 	// Value has to be false to pass tests
 	$test_false = array(
-	'suhosin.sql.bailout_on_error',
-	'suhosin.cookie.encrypt',
-	'suhosin.session.encrypt',
+		'suhosin.sql.bailout_on_error',
+		'suhosin.cookie.encrypt',
+		'suhosin.session.encrypt',
 	);
 
 	foreach($test_false as $test)

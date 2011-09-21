@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.0
-	@date    2011/09/06
+	@version 0.9.1
+	@date    2011/09/21
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -31,7 +31,7 @@ $mysqlPassword = '';
 function improvedIntVal($value)
 {
 	$value = (string)$value;
-	$new   = "";
+	$new   = '';
 	$found = false;
 
 	// Build
@@ -89,13 +89,13 @@ function mySqlVersionIntToString($version)
 // Check for lower than 5.2.9
 if( version_compare(PHP_VERSION, '5.2.9', '<') )
 {
-	$errors[] = "PHP 5.2.9 or newer is required. ".PHP_VERSION." does not meet this requirement.";
+	$errors[] = 'PHP 5.2.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 }
 
 // If 5.3, check for lower than 5.3.5
 if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
 {
-	$errors[] = "PHP 5.3.5 or newer is required. ".PHP_VERSION." does not meet this requirement.";
+	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 }
 
 /* ------------
@@ -110,20 +110,20 @@ foreach( $functionsToBeEnabled as $test )
 {
 	if (!function_exists($test) || in_array($test, $disabledFunctions))
 	{
-		$errors[] = "Function {$test} is required to be enabled in PHP!";
+		$errors[] = 'Function '.$test.' is required to be enabled in PHP!';
 	}
 }
 
 // Do we have access to eval?
 if ( in_array('eval', $disabledFunctions) )
 {
-	$errors[] = "Language construct eval is required to be enabled in PHP!";
+	$errors[] = 'Language construct eval is required to be enabled in PHP!';
 }
 
 // Magic Quotes
 if ( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
 {
-	$errors[] = "magic_quotes_gpc is enabled in your php.ini! Please ask your host to disable it for better functionality.";
+	$errors[] = 'magic_quotes_gpc is enabled in your php.ini! Please ask your host to disable it for better functionality.';
 }
 
 // Safe Mode
@@ -156,7 +156,7 @@ foreach( $required_extensions as $test )
 {
 	if ( !extension_loaded($test[0]) )
 	{
-		$errors[] = "The required PHP extension \"{$test[1]}\" could not be found. Please ask your host to install this extension.";
+		$errors[] = 'The required PHP extension "'.$test[1].'" could not be found. Please ask your host to install this extension.';
 	}
 }
 
@@ -174,7 +174,7 @@ if( extension_loaded('curl') )
 	{
 		if (!function_exists($test) || in_array($test, $disabledFunctions))
 		{
-			$errors[] = "The required PHP extension \"cURL\" was found, but function {$test} is disabled, please ask your host to enable it!";
+			$errors[] = 'The required PHP extension "cURL" was found, but function '.$test.' is disabled, please ask your host to enable it!';
 		}
 	}
 
@@ -189,7 +189,7 @@ if( extension_loaded('curl') )
 			if( !($curlVersion['features'] && constant($feature)) )
 			{
 				$test = $curlBitFriendly[$arr_key];
-				$errors[] = "The required PHP extension \"cURL\" was found, but {$test} support is missing. Please ask your host to add support for {$test} in cURL.";
+				$errors[] = 'The required PHP extension "cURL" was found, but '.$test.' support is missing. Please ask your host to add support for '.$test.' in cURL.';
 			}
 		}
 	}
@@ -209,7 +209,7 @@ if( function_exists('gd_info') )
 	{
 		if( !function_exists($test[0]) )
 		{
-			$errors[] = "The required PHP extension \"GD Library\" was found, but {$test[1]} support is missing. Please ask your host to add support for {$test[1]} images.";
+			$errors[] = 'The required PHP extension "GD Library" was found, but '.$test[1].' support is missing. Please ask your host to add support for '.$test[1].' images.';
 		}
 	}
 
@@ -217,7 +217,7 @@ if( function_exists('gd_info') )
 	$gdInfo = gd_info();
 	if( @$gdInfo['FreeType Support'] == false )
 	{
-		$errors[] = "The required PHP extension \"GD Library\" was found, but FreeType support is missing. Please ask your host to add support for this.";
+		$errors[] = 'The required PHP extension "GD Library" was found, but FreeType support is missing. Please ask your host to add support for this.';
 	}
 }
 
@@ -238,7 +238,7 @@ if( $memLimit = @ini_get('memory_limit') )
 	$recLimit = (128*1024*1024);
 	if($memLimit < $recLimit)
 	{
-		$errors[] = "Memory Limit: ".(int)($recLimit/(1024*1024))."M is required. Please ask your host to increase this setting.";
+		$errors[] = 'Memory Limit: '.(int)($recLimit/(1024*1024)).'M is required. Please ask your host to increase this setting.';
 	}
 
 }
@@ -276,7 +276,7 @@ if( extension_loaded('suhosin') )
 	{
 		if( @ini_get($test) != false )
 		{
-			$errors[] = "{$test} is required to be set to <b>off</b> in php.ini. Your host does not meet this requirement.";
+			$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your host does not meet this requirement.';
 		}
 	}
 	foreach($test_values as $test)
@@ -285,7 +285,7 @@ if( extension_loaded('suhosin') )
 		{
 			if( @ini_get($test['0']) < $test['1'])
 			{
-				$errors[] = "It is required that <b>{$test['0']}</b> is set to <b>{$test['1']}</b> or higher.";
+				$errors[] = 'It is required that <b>'.$test['0'].'</b> is set to <b>'.$test['1'].'</b> or higher.';
 			}
 		}
 	}
@@ -305,7 +305,7 @@ if( $mysqlEnabled )
 
 		if(!$mysqli)
 		{
-			$errors[] = "Unable to connect to MySQLi: ".mysqli_connect_error();
+			$errors[] = 'Unable to connect to MySQLi: '.mysqli_connect_error();
 		}
 		else
 		{
@@ -316,12 +316,12 @@ if( $mysqlEnabled )
 	}
 	elseif( function_exists('mysql_connect') )
 	{
-		$mysqlHostname = "{$mysqlHostname}:{$mysqlPortnum}";
+		$mysqlHostname = $mysqlHostname.':'.$mysqlPortnum;
 		$mysql = @mysql_connect($mysqlHostname,$mysqlUsername,$mysqlPassword);
 
 		if(!$mysql)
 		{
-			$errors[] = "Unable to connect to MySQL: ".mysql_error();
+			$errors[] = 'Unable to connect to MySQL: '.mysql_error();
 		}
 		else
 		{
@@ -335,15 +335,15 @@ if( $mysqlEnabled )
 	{
 		if($server_version < 50000)
 		{
-			$errors[] = "Your MySQL Version (".mySqlVersionIntToString($server_version).") is end-of-life. Please ask your host to upgrade MySQL!";
+			$errors[] = 'Your MySQL Version ('.mySqlVersionIntToString($server_version).') is end-of-life. Please ask your host to upgrade MySQL!';
 		}
 		elseif($server_version < 50100)
 		{
-			$errors[] = "You are running MySQL ".mySqlVersionIntToString($server_version).", please ask your host to upgrade to MySQL 5.1!";
+			$errors[] = 'You are running MySQL '.mySqlVersionIntToString($server_version).', please ask your host to upgrade to MySQL 5.1!';
 		}
 		if( ($server_version-$client_version)>=1000 )
 		{
-			$errors[] = "Your PHP MySQL library version (".mySqlVersionIntToString($client_version).") does not match MySQL Server version (".mySqlVersionIntToString($server_version).")! Please ask your host to fix this issue.";
+			$errors[] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).')! Please ask your host to fix this issue.';
 		}
 	}
 }
@@ -368,13 +368,13 @@ if( isset($errors) && count($errors) )
 	// Errors
 	foreach($errors as $error)
 	{
-		echo $error."\r\n";
+		echo $error.'<br />'."\r\n";
 	}
 }
 else
 {
 	// Balls to you!
-	echo "Congratulations, no problems have been detected.";
+	echo 'Congratulations, no problems have been detected'.'<br />'."\r\n";
 }
 
 // Footer

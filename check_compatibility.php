@@ -31,7 +31,7 @@ $mysqlPassword = '';
 function intAbs($number)
 {
 	return (int)str_replace('-','',(string)$number);
-} 
+}
 
 function improvedIntVal($value)
 {

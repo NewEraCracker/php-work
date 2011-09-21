@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.1
+	@version 0.9.2
 	@date    2011/09/21
 	@license Public Domain
 
@@ -27,6 +27,11 @@ $mysqlPassword = '';
 /* ---------
    Functions
    --------- */
+   
+function intAbs($number)
+{
+	return (int)str_replace('-','',(string)$number);
+} 
 
 function improvedIntVal($value)
 {
@@ -341,7 +346,7 @@ if( $mysqlEnabled )
 		{
 			$errors[] = 'You are running MySQL '.mySqlVersionIntToString($server_version).', please ask your host to upgrade to MySQL 5.1!';
 		}
-		if( ($server_version-$client_version)>=1000 )
+		if( intAbs($server_version-$client_version) >= 1000 )
 		{
 			$errors[] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).')! Please ask your host to fix this issue.';
 		}

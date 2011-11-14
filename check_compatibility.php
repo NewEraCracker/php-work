@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.2
-	@date    2011/09/21
+	@version 0.9.3
+	@date    2011/11/14
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -113,20 +113,20 @@ $disabledFunctions    = array_merge($disabledFunctions, array_map('trim', explod
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
 foreach( $functionsToBeEnabled as $test )
 {
-	if (!function_exists($test) || in_array($test, $disabledFunctions))
+	if(!function_exists($test) || in_array($test, $disabledFunctions))
 	{
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP!';
 	}
 }
 
 // Do we have access to eval?
-if ( in_array('eval', $disabledFunctions) )
+if( in_array('eval', $disabledFunctions) )
 {
 	$errors[] = 'Language construct eval is required to be enabled in PHP!';
 }
 
 // Magic Quotes
-if ( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
+if( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
 {
 	$errors[] = 'magic_quotes_gpc is enabled in your php.ini! Please ask your host to disable it for better functionality.';
 }
@@ -159,7 +159,7 @@ $required_extensions = array(
 
 foreach( $required_extensions as $test )
 {
-	if ( !extension_loaded($test[0]) )
+	if( !extension_loaded($test[0]) )
 	{
 		$errors[] = 'The required PHP extension "'.$test[1].'" could not be found. Please ask your host to install this extension.';
 	}
@@ -177,7 +177,7 @@ if( extension_loaded('curl') )
 		);
 	foreach( $curlFuctions as $test )
 	{
-		if (!function_exists($test) || in_array($test, $disabledFunctions))
+		if(!function_exists($test) || in_array($test, $disabledFunctions))
 		{
 			$errors[] = 'The required PHP extension "cURL" was found, but function '.$test.' is disabled, please ask your host to enable it!';
 		}

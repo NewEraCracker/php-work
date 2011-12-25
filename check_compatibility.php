@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.3
-	@date    2011/11/14
+	@version 0.9.4
+	@date    2011/12/25
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -151,6 +151,7 @@ $required_extensions = array(
 	array( 'openssl', 'OpenSSL'  ),
 	array( 'pcre', 'Perl-Compatible Regular Expressions' ),
 	array( 'reflection', 'Reflection Class' ),
+	array( 'session', 'Session' ),
 	array( 'spl', 'SPL' ),
 	array( 'xml', 'XML Parser' ),
 	array( 'zip', 'Zip' ),
@@ -168,6 +169,8 @@ foreach( $required_extensions as $test )
 // Check cURL
 if( extension_loaded('curl') )
 {
+	$curlFound = 'The required PHP extension "cURL" was found';
+
 	// Some fail hosts have cURL but disable its functions. Lets check for that.
 	$curlFuctions = array(
 		'curl_close', 'curl_copy_handle', 'curl_errno', 'curl_error', 'curl_exec', 'curl_getinfo',
@@ -179,7 +182,7 @@ if( extension_loaded('curl') )
 	{
 		if(!function_exists($test) || in_array($test, $disabledFunctions))
 		{
-			$errors[] = 'The required PHP extension "cURL" was found, but function '.$test.' is disabled, please ask your host to enable it!';
+			$errors[] = $curlFound.', but function '.$test.' is disabled, please ask your host to enable it!';
 		}
 	}
 
@@ -194,7 +197,7 @@ if( extension_loaded('curl') )
 			if( !($curlVersion['features'] && constant($feature)) )
 			{
 				$test = $curlBitFriendly[$arr_key];
-				$errors[] = 'The required PHP extension "cURL" was found, but '.$test.' support is missing. Please ask your host to add support for '.$test.' in cURL.';
+				$errors[] = $curlFound.', but '.$test.' support is missing. Please ask your host to add support for '.$test.' in cURL.';
 			}
 		}
 	}
@@ -203,6 +206,8 @@ if( extension_loaded('curl') )
 // Check GD
 if( function_exists('gd_info') )
 {
+	$gdFound = 'The required PHP extension "GD Library" was found';
+
 	// We need GIF, JPEG and PNG support
 	$required_gd = array(
 		array( 'imagecreatefromgif', 'GIF' ),
@@ -214,15 +219,19 @@ if( function_exists('gd_info') )
 	{
 		if( !function_exists($test[0]) )
 		{
-			$errors[] = 'The required PHP extension "GD Library" was found, but '.$test[1].' support is missing. Please ask your host to add support for '.$test[1].' images.';
+			$errors[] = $gdFound.', but '.$test[1].' support is missing. Please ask your host to add support for '.$test[1].' images.';
 		}
 	}
 
-	// We need Freetype support
-	$gdInfo = gd_info();
+	// We need GD 2 and freetype support
+	$gdInfo = @gd_info();
+	if( @$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"],'2.') )
+	{
+		$errors[] = $gdFound.', but GD Version is older than v2. Please ask your host to fix this issue.';
+	}
 	if( @$gdInfo['FreeType Support'] == false )
 	{
-		$errors[] = 'The required PHP extension "GD Library" was found, but FreeType support is missing. Please ask your host to add support for this.';
+		$errors[] = $gdFound.', but FreeType support is missing. Please ask your host to add support for this.';
 	}
 }
 

@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.4
-	@date    2011/12/25
+	@version 0.9.7
+	@date    2012/01/03
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -93,15 +93,11 @@ function mySqlVersionIntToString($version)
 
 // Check for lower than 5.2.9
 if( version_compare(PHP_VERSION, '5.2.9', '<') )
-{
 	$errors[] = 'PHP 5.2.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
-}
 
 // If 5.3, check for lower than 5.3.5
 if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
-{
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
-}
 
 /* ------------
    PHP Settings
@@ -114,28 +110,24 @@ $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_se
 foreach( $functionsToBeEnabled as $test )
 {
 	if(!function_exists($test) || in_array($test, $disabledFunctions))
-	{
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP!';
-	}
 }
 
 // Do we have access to eval?
 if( in_array('eval', $disabledFunctions) )
-{
 	$errors[] = 'Language construct eval is required to be enabled in PHP!';
-}
 
 // Magic Quotes
 if( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
-{
 	$errors[] = 'magic_quotes_gpc is enabled in your php.ini! Please ask your host to disable it for better functionality.';
-}
 
 // Safe Mode
 if( @ini_get('safe_mode') )
-{
 	$errors[] = 'PHP must not be running in safe_mode. Please ask your host to disable the PHP safe_mode setting.';
-}
+
+// Output Handler
+if( @ini_get('output_handler') == 'ob_gzhandler')
+	$errors[] = 'PHP must not be running with output_handler set to ob_gzhandler. Please ask your host to fix this setting.';
 
 // Check PHP extensions
 $required_extensions = array(
@@ -161,9 +153,7 @@ $required_extensions = array(
 foreach( $required_extensions as $test )
 {
 	if( !extension_loaded($test[0]) )
-	{
 		$errors[] = 'The required PHP extension "'.$test[1].'" could not be found. Please ask your host to install this extension.';
-	}
 }
 
 // Check cURL
@@ -181,9 +171,7 @@ if( extension_loaded('curl') )
 	foreach( $curlFuctions as $test )
 	{
 		if(!function_exists($test) || in_array($test, $disabledFunctions))
-		{
 			$errors[] = $curlFound.', but function '.$test.' is disabled, please ask your host to enable it!';
-		}
 	}
 
 	// We need SSL and ZLIB support
@@ -194,11 +182,9 @@ if( extension_loaded('curl') )
 
 		foreach($curlBitFields as $arr_key => $feature)
 		{
+			$test = $curlBitFriendly[$arr_key];
 			if( !($curlVersion['features'] && constant($feature)) )
-			{
-				$test = $curlBitFriendly[$arr_key];
 				$errors[] = $curlFound.', but '.$test.' support is missing. Please ask your host to add support for '.$test.' in cURL.';
-			}
 		}
 	}
 }
@@ -218,21 +204,17 @@ if( function_exists('gd_info') )
 	foreach( $required_gd as $test )
 	{
 		if( !function_exists($test[0]) )
-		{
 			$errors[] = $gdFound.', but '.$test[1].' support is missing. Please ask your host to add support for '.$test[1].' images.';
-		}
 	}
 
 	// We need GD 2 and freetype support
 	$gdInfo = @gd_info();
+
 	if( @$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"],'2.') )
-	{
 		$errors[] = $gdFound.', but GD Version is older than v2. Please ask your host to fix this issue.';
-	}
+
 	if( @$gdInfo['FreeType Support'] == false )
-	{
 		$errors[] = $gdFound.', but FreeType support is missing. Please ask your host to add support for this.';
-	}
 }
 
 // Check RAM limits
@@ -251,10 +233,7 @@ if( $memLimit = @ini_get('memory_limit') )
 
 	$recLimit = (128*1024*1024);
 	if($memLimit < $recLimit)
-	{
 		$errors[] = 'Memory Limit: '.(int)($recLimit/(1024*1024)).'M is required. Please ask your host to increase this setting.';
-	}
-
 }
 
 /* ----------------
@@ -289,18 +268,14 @@ if( extension_loaded('suhosin') )
 	foreach($test_false as $test)
 	{
 		if( @ini_get($test) != false )
-		{
 			$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your host does not meet this requirement.';
-		}
 	}
 	foreach($test_values as $test)
 	{
 		if( isset($test['0']) && isset($test['1']) )
 		{
 			if( @ini_get($test['0']) < $test['1'])
-			{
 				$errors[] = 'It is required that <b>'.$test['0'].'</b> is set to <b>'.$test['1'].'</b> or higher.';
-			}
 		}
 	}
 }
@@ -373,25 +348,21 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 <title>check_compatibility.php</title>
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 </head>
-<body>
-<pre>';
+<body>';
 
 // Body
 if( isset($errors) && count($errors) )
 {
 	// Errors
 	foreach($errors as $error)
-	{
-		echo $error.'<br />'."\r\n";
-	}
+		echo $error.'<br />';
 }
 else
 {
 	// Balls to you!
-	echo 'Congratulations, no problems have been detected'.'<br />'."\r\n";
+	echo 'Congratulations, no problems have been detected';
 }
 
 // Footer
-echo '</pre>
-</body>
+echo '</body>
 </html>';

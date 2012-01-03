@@ -5,8 +5,8 @@
 	--------------------
 
 	Created by NewEraCracker
-	Date    2011/07/08
-	Version 1.0.4
+	Date    2012/01/03
+	Version 1.0.5
 
 	Requirements:
 	= PHP 5.2 or higher
@@ -61,13 +61,10 @@ function check_proxy()
 
 	// Fix configuration
 	if(!$check_ports)
-	{
 		$ports = array();
-	}
+
 	if(!$check_headers)
-	{
 		$headers = array();
-	}
 
 	// Ban certain IPs
 	if( count($banned_ips) )
@@ -77,9 +74,7 @@ function check_proxy()
 			$test = strpos($userip,$ip);
 
 			if($test !== false && $test == 0)
-			{
 				return true;
-			}		
 		}
 		unset($ip);
 	}
@@ -92,9 +87,7 @@ function check_proxy()
 			$test = strpos($useragent,$ua);
 
 			if($test !== false)
-			{
 				return true;
-			}	
 		}
 		unset($ua);
 	}
@@ -107,9 +100,7 @@ function check_proxy()
 			$test = strpos($userip,$ip);
 
 			if($test !== false && $test == 0)
-			{
 				return false;
-			}		
 		}
 		unset($ip);
 	}
@@ -122,9 +113,7 @@ function check_proxy()
 			$test = strpos($useragent,$ua);
 
 			if($test !== false)
-			{
 				return false;
-			}
 		}
 		unset($ua);
 	}
@@ -144,9 +133,7 @@ function check_proxy()
 
 		// Has database been initialized?
 		if( !$db_installed )
-		{
 			mysql_query($db_setup) or die(mysql_error());
-		}
 
 		// Now query for the IP address
 		$db_result = mysql_query($db_query) or die(mysql_error());

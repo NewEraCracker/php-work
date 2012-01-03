@@ -1,8 +1,9 @@
 <?php
 /* 
-	iS MA HOS' NOOBISH? v2.5.5
+	iS MA HOS' NOOBISH?
 	@author   NewEraCracker
-	@date     2011/07/10
+	@version  2.5.6
+	@date     2012/01/03
 	@license  Public Domain
 	@notes    newfags can't triforce
 */
@@ -20,9 +21,7 @@ $issues = array();
 foreach ($functionsToBeDisabled as $test)
 {
 	if(function_exists($test) && !(in_array($test, $disabledFunctions)))
-	{
 		$issues[] = "Function ".$test." should be disabled!";
-	}
 }
 unset($test);
 
@@ -30,9 +29,7 @@ unset($test);
 foreach ($functionsToBeEnabled as $test)
 {
 	if(!function_exists($test) || in_array($test, $disabledFunctions))
-	{
 		$issues[] = "Function ".$test." should be enabled!";
-	}
 }
 unset($test);
 
@@ -46,16 +43,16 @@ if( in_array("eval", $disabledFunctions) )
 if( function_exists('dl') && !(in_array('dl', $disabledFunctions)) )
 {
 	if (ini_get('enable_dl'))
-	{
 		$issues[] = "enable_dl should be Off!";
-	}
 }
 
 // Safe mode?
-if (ini_get('safe_mode')) { $issues[] = "Issue: safe_mode is On!"; }
+if (ini_get('safe_mode'))
+	$issues[] = "Issue: safe_mode is On!";
 
 // magic_quotes_gpc?
-if (ini_get('magic_quotes_gpc')) { $issues[] = "Issue: magic_quotes_gpc is On!"; }
+if (ini_get('magic_quotes_gpc'))
+	$issues[] = "Issue: magic_quotes_gpc is On!";
 
 // Output results
 echo "<pre>";
@@ -68,10 +65,7 @@ else
 	echo "Your host scored ".count($issues)." noobish points!".$crlf.$crlf;
 
 	foreach($issues as $issue)
-	{
 		echo "Issue: {$issue}".$crlf;
-	}
-	unset($issue);
 }
 echo "</pre>";
 ?>

@@ -1,8 +1,9 @@
 <?php
 /*
-	Suhosin Configuration Checker v0.5.3
+	Suhosin Configuration Checker
 	@author  NewEraCracker
-	@date    2011/09/06
+	@version 0.5.4
+	@date    2012/01/03
 	@license Public Domain
 */
 
@@ -51,36 +52,27 @@ else
 	foreach($test_false as $test)
 	{
 		if( ini_get($test) != false )
-		{
 			$problems[] = "Please ask your host to <b>disable (turn off) {$test}</b> in php.ini.";
-		}
 	}
 	foreach($test_values as $test)
 	{
 		if( isset($test['0']) && isset($test['1']) )
 		{
 			if( ini_get($test['0']) < $test['1'])
-			{
 				$problems[] = "Please ask your host to set <b>{$test['0']}</b> in php.ini to <b>{$test['1']}</b> or higher.";
-			}
 		}
 	}
 	if( !count($problems) )
-	{
 		$informations[] = "<b>No problems detected!</b>";
-	}
 }
 
 echo "<pre>";
 foreach($informations as $info)
-{
 	echo $info."\r\n";
-}
 
 foreach($problems as $problem)
-{
 	echo $problem."\r\n";
-}
+
 echo "</pre>";
 
 ?>

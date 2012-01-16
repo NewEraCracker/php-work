@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.7
-	@date    2012/01/03
+	@version 0.9.8
+	@date    2012/01/16
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -27,7 +27,7 @@ $mysqlPassword = '';
 /* ---------
    Functions
    --------- */
-   
+
 function intAbs($number)
 {
 	return (int)str_replace('-','',(string)$number);
@@ -109,7 +109,7 @@ $disabledFunctions    = array_merge($disabledFunctions, array_map('trim', explod
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
 foreach( $functionsToBeEnabled as $test )
 {
-	if(!function_exists($test) || in_array($test, $disabledFunctions))
+	if( !function_exists($test) || in_array($test, $disabledFunctions) )
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP!';
 }
 
@@ -127,7 +127,12 @@ if( @ini_get('safe_mode') )
 
 // Output Handler
 if( @ini_get('output_handler') == 'ob_gzhandler')
-	$errors[] = 'PHP must not be running with output_handler set to ob_gzhandler. Please ask your host to fix this setting.';
+	$errors[] = 'PHP must not be running with output_handler set to ob_gzhandler. Please ask your host to disable this setting.';
+
+// Upload dir
+$upload_dir = @ini_get('upload_tmp_dir') ? @ini_get('upload_tmp_dir') : @sys_get_temp_dir();
+if( !empty($upload_dir) && !is_writable($upload_dir) )
+	$errors[] = 'Your upload temporary directory '.htmlspecialchars($upload_dir).' is not writable. Please ask your host to fix this issue.';
 
 // Check PHP extensions
 $required_extensions = array(
@@ -244,8 +249,8 @@ if( extension_loaded('suhosin') )
 	// Value has to be the same or higher to pass tests
 	$test_values = array(
 		array( 'suhosin.get.max_name_length', 512 ),
-		array( 'suhosin.get.max_totalname_length', 512 ), 
-		array( 'suhosin.get.max_value_length', 1024 ), 
+		array( 'suhosin.get.max_totalname_length', 512 ),
+		array( 'suhosin.get.max_value_length', 1024 ),
 		array( 'suhosin.post.max_array_index_length', 256 ),
 		array( 'suhosin.post.max_name_length', 512 ),
 		array( 'suhosin.post.max_totalname_length', 8192 ),

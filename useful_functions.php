@@ -51,4 +51,40 @@ function readdir_recursive_string($dir, $dir_len=null)
 	// Return our result
 	return ltrim($contents);
 }
+
+function normalize_text_file($f)
+{
+	// Bail out on error
+	if( !is_file($f) || !is_readable($f) || !is_writable($f) )
+		return;
+
+	// Grab contents and normalize them
+	$c = rtrim(convert_to_crlf(file_get_contents($f)));
+
+	// Explode the normalized contents
+	$c = explode("\r\n",$c);
+
+	// Build new contents while normalizing them
+	$new = '';
+	for($i=0;$i<count($c);$i++)
+		$new .= rtrim($c[$i])."\r\n";
+	$new = rtrim($new);
+
+	// Write the new contents to the file
+	file_put_contents($f,$new);
+}
+
+function convert_to_crlf($text)
+{
+	// First, we take care of CRLF itself
+	$text = str_replace("\r\n","\n",$text);
+
+	// Then, we take care of any CR left
+	$text = str_replace("\r","\n",$text);
+
+	// Finally, we convert the LF back to CRLF
+	$text = str_replace("\n","\r\n",$text);
+
+	return $text;
+}
 ?>

@@ -3,12 +3,12 @@
  * License: Public Domain
  */
 
-function readdir_recursive($dir)
+function readdir_recursive($dir, $show_dirs=false)
 {
-	return explode("\r\n", readdir_recursive_string($dir));
+	return explode("\r\n", readdir_recursive_string($dir, $show_dirs));
 }
 
-function readdir_recursive_string($dir, $dir_len=null)
+function readdir_recursive_string($dir, $show_dirs=false, $dir_len=null)
 {
 	// Be sure about dir
 	$dir = realpath($dir);
@@ -30,9 +30,13 @@ function readdir_recursive_string($dir, $dir_len=null)
 			$file = realpath($dir."/".$file);
 			if( is_dir($file) )
 			{
+				// If $show_dirs is true, dir names will also be listed
+				if( $show_dirs )
+					echo "\r\n".substr($file, $dir_len);
+
 				// Read recursively another dir below the original dir
 				// We pass $dir_len here so the path is relative to the 'mother' dir
-				echo "\r\n".readdir_recursive_string($file, $dir_len);
+				echo "\r\n".readdir_recursive_string($file, $show_dirs, $dir_len);
 			}
 			else
 			{

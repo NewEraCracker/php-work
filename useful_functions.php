@@ -32,7 +32,7 @@ function readdir_recursive_string($dir, $dir_len=null)
 			{
 				// Read recursively another dir below the original dir
 				// We pass $dir_len here so the path is relative to the 'mother' dir
-				echo readdir_recursive_string($file, $dir_len);
+				echo "\r\n".readdir_recursive_string($file, $dir_len);
 			}
 			else
 			{

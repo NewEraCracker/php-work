@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.0
+	@version 1.0.1
 	@date    2012/03/12
 	@license Public Domain
 
@@ -113,21 +113,18 @@ foreach( $functionsToBeEnabled as $test )
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP.';
 }
 
-// Do we have access to eval?
-if( in_array('eval', $disabledFunctions) )
-	$errors[] = 'Language construct eval is required to be enabled in PHP.';
+// Eval, Magic Quotes, Safe Mode, Output Handler, Zlib Output Compression
+$php_checks = array(
+	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
+	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini, disable it for better functionality.'),
+	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode, disable the PHP safe_mode setting.'),
+	array( @ini_get('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler, disable this setting.'),
+	array( @ini_get('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled, disable this setting.'),
+);
 
-// Magic Quotes
-if( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
-	$errors[] = 'magic_quotes_gpc is enabled in your php.ini, please disable it for better functionality.';
-
-// Safe Mode
-if( @ini_get('safe_mode') )
-	$errors[] = 'PHP must not be running in safe_mode. Please disable the PHP safe_mode setting.';
-
-// Output Handler
-if( @ini_get('output_handler') == 'ob_gzhandler')
-	$errors[] = 'PHP must not be running with output_handler set to ob_gzhandler. Please disable this setting.';
+foreach( $php_checks as $fail )
+	if( $fail[0] )
+		$errors[] = $fail[1];
 
 // Upload dir
 $upload_dir = @ini_get('upload_tmp_dir') ? @ini_get('upload_tmp_dir') : @sys_get_temp_dir();
@@ -364,7 +361,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 if( isset($errors) && count($errors) )
 {
 	// Errors
-	echo 'The following issues have been found, please ask your host to fix them:<br />';
+	echo 'The following issues have been found, please ask your host to fix them:<br /><br />';
 	foreach($errors as $error)
 		echo $error.'<br />';
 }

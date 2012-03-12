@@ -202,10 +202,8 @@ if( function_exists('gd_info') )
 	);
 
 	foreach( $required_gd as $test )
-	{
 		if( !function_exists($test[0]) )
 			$errors[] = $gdFound.', but '.$test[1].' support is missing. Please add support for '.$test[1].' images in GD Library.';
-	}
 
 	// We need GD 2 and freetype support
 	$gdInfo = @gd_info();

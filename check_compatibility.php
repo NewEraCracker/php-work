@@ -364,7 +364,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 if( isset($errors) && count($errors) )
 {
 	// Errors
-	echo 'The following issues have been found, please ask your host to fix them:';
+	echo 'The following issues have been found, please ask your host to fix them:<br />';
 	foreach($errors as $error)
 		echo $error.'<br />';
 }

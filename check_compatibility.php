@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.9
+	@version 1.0.0
 	@date    2012/03/12
 	@license Public Domain
 
@@ -110,16 +110,16 @@ $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_se
 foreach( $functionsToBeEnabled as $test )
 {
 	if( !function_exists($test) || in_array($test, $disabledFunctions) )
-		$errors[] = 'Function '.$test.' is required to be enabled in PHP!';
+		$errors[] = 'Function '.$test.' is required to be enabled in PHP.';
 }
 
 // Do we have access to eval?
 if( in_array('eval', $disabledFunctions) )
-	$errors[] = 'Language construct eval is required to be enabled in PHP!';
+	$errors[] = 'Language construct eval is required to be enabled in PHP.';
 
 // Magic Quotes
 if( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
-	$errors[] = 'magic_quotes_gpc is enabled in your php.ini! Please disable it for better functionality.';
+	$errors[] = 'magic_quotes_gpc is enabled in your php.ini, please disable it for better functionality.';
 
 // Safe Mode
 if( @ini_get('safe_mode') )
@@ -175,7 +175,7 @@ if( extension_loaded('curl') )
 		);
 	foreach( $curlFuctions as $test )
 		if(!function_exists($test) || in_array($test, $disabledFunctions))
-			$errors[] = $curlFound.', but function '.$test.' is disabled, please enable it!';
+			$errors[] = $curlFound.', but function '.$test.' is disabled, please enable it.';
 
 	// We need SSL and ZLIB support
 	if( $curlVersion = @curl_version() )
@@ -216,7 +216,7 @@ if( function_exists('gd_info') )
 	if( @$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"],'2.') )
 		$errors[] = $gdFound.', but GD Version is older than v2. Please fix this issue.';
 
-	if( @$gdInfo['FreeType Support'] == false )
+	if( ! @$gdInfo['FreeType Support'] )
 		$errors[] = $gdFound.', but FreeType support is missing. Please add support for this.';
 }
 
@@ -231,7 +231,7 @@ if( function_exists('ioncube_loader_version') )
 }
 else
 {
-	$errors[] = 'You don\'t seem to have IonCube Loaders installed.';
+	$errors[] = 'You do not seem to have IonCube Loaders installed.';
 }
 
 // Check RAM limits
@@ -371,7 +371,7 @@ if( isset($errors) && count($errors) )
 else
 {
 	// Balls to you!
-	echo 'Congratulations, no problems have been detected';
+	echo 'Congratulations, no problems have been detected.';
 }
 
 // Footer

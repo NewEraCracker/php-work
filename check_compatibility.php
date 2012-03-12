@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 0.9.8
-	@date    2012/01/16
+	@version 0.9.9
+	@date    2012/03/12
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -96,7 +96,7 @@ if( version_compare(PHP_VERSION, '5.2.9', '<') )
 	$errors[] = 'PHP 5.2.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // If 5.3, check for lower than 5.3.5
-if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
+elseif( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 /* ------------
@@ -104,8 +104,8 @@ if( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5
    ------------ */
 
 // Functions to be enabled
-$disabledFunctions    = array_map('trim', explode(',',@ini_get('disable_functions')) );
-$disabledFunctions    = array_merge($disabledFunctions, array_map('trim', explode(',',@ini_get('suhosin.executor.func.blacklist'))) );
+$disabledFunctions = array_map('trim', explode(',',@ini_get('disable_functions')) );
+$disabledFunctions = array_merge($disabledFunctions, array_map('trim', explode(',',@ini_get('suhosin.executor.func.blacklist'))) );
 $functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
 foreach( $functionsToBeEnabled as $test )
 {
@@ -119,20 +119,20 @@ if( in_array('eval', $disabledFunctions) )
 
 // Magic Quotes
 if( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc() )
-	$errors[] = 'magic_quotes_gpc is enabled in your php.ini! Please ask your host to disable it for better functionality.';
+	$errors[] = 'magic_quotes_gpc is enabled in your php.ini! Please disable it for better functionality.';
 
 // Safe Mode
 if( @ini_get('safe_mode') )
-	$errors[] = 'PHP must not be running in safe_mode. Please ask your host to disable the PHP safe_mode setting.';
+	$errors[] = 'PHP must not be running in safe_mode. Please disable the PHP safe_mode setting.';
 
 // Output Handler
 if( @ini_get('output_handler') == 'ob_gzhandler')
-	$errors[] = 'PHP must not be running with output_handler set to ob_gzhandler. Please ask your host to disable this setting.';
+	$errors[] = 'PHP must not be running with output_handler set to ob_gzhandler. Please disable this setting.';
 
 // Upload dir
 $upload_dir = @ini_get('upload_tmp_dir') ? @ini_get('upload_tmp_dir') : @sys_get_temp_dir();
 if( !empty($upload_dir) && !is_writable($upload_dir) )
-	$errors[] = 'Your upload temporary directory '.htmlspecialchars($upload_dir).' is not writable. Please ask your host to fix this issue.';
+	$errors[] = 'Your upload temporary directory '.htmlspecialchars($upload_dir).' is not writable. Please fix this issue.';
 
 // Check PHP extensions
 $required_extensions = array(
@@ -158,7 +158,7 @@ $required_extensions = array(
 foreach( $required_extensions as $test )
 {
 	if( !extension_loaded($test[0]) )
-		$errors[] = 'The required PHP extension "'.$test[1].'" could not be found. Please ask your host to install this extension.';
+		$errors[] = 'The required PHP extension "'.$test[1].'" could not be found. You need to install/enable this extension.';
 }
 
 // Check cURL
@@ -166,7 +166,7 @@ if( extension_loaded('curl') )
 {
 	$curlFound = 'The required PHP extension "cURL" was found';
 
-	// Some fail hosts have cURL but disable its functions. Lets check for that.
+	// Some hosts have cURL but disable its functions. Lets check for that.
 	$curlFuctions = array(
 		'curl_close', 'curl_copy_handle', 'curl_errno', 'curl_error', 'curl_exec', 'curl_getinfo',
 		'curl_init', 'curl_multi_add_handle', 'curl_multi_close', 'curl_multi_exec', 'curl_multi_getcontent',
@@ -174,10 +174,8 @@ if( extension_loaded('curl') )
 		'curl_setopt_array', 'curl_setopt', 'curl_version',
 		);
 	foreach( $curlFuctions as $test )
-	{
 		if(!function_exists($test) || in_array($test, $disabledFunctions))
-			$errors[] = $curlFound.', but function '.$test.' is disabled, please ask your host to enable it!';
-	}
+			$errors[] = $curlFound.', but function '.$test.' is disabled, please enable it!';
 
 	// We need SSL and ZLIB support
 	if( $curlVersion = @curl_version() )
@@ -189,7 +187,7 @@ if( extension_loaded('curl') )
 		{
 			$test = $curlBitFriendly[$arr_key];
 			if( !($curlVersion['features'] && constant($feature)) )
-				$errors[] = $curlFound.', but '.$test.' support is missing. Please ask your host to add support for '.$test.' in cURL.';
+				$errors[] = $curlFound.', but '.$test.' support is missing. Please add support for '.$test.' in cURL.';
 		}
 	}
 }
@@ -209,17 +207,31 @@ if( function_exists('gd_info') )
 	foreach( $required_gd as $test )
 	{
 		if( !function_exists($test[0]) )
-			$errors[] = $gdFound.', but '.$test[1].' support is missing. Please ask your host to add support for '.$test[1].' images.';
+			$errors[] = $gdFound.', but '.$test[1].' support is missing. Please add support for '.$test[1].' images in GD Library.';
 	}
 
 	// We need GD 2 and freetype support
 	$gdInfo = @gd_info();
 
 	if( @$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"],'2.') )
-		$errors[] = $gdFound.', but GD Version is older than v2. Please ask your host to fix this issue.';
+		$errors[] = $gdFound.', but GD Version is older than v2. Please fix this issue.';
 
 	if( @$gdInfo['FreeType Support'] == false )
-		$errors[] = $gdFound.', but FreeType support is missing. Please ask your host to add support for this.';
+		$errors[] = $gdFound.', but FreeType support is missing. Please add support for this.';
+}
+
+// Check Ioncube
+if( function_exists('ioncube_loader_version') )
+{
+	if( !function_exists('ioncube_loader_iversion') )
+		$errors[] = 'You have a VERY old version of IonCube Loaders which is known to cause problems.';
+
+	elseif( ioncube_loader_iversion() < 40007 && version_compare(phpversion(), '5.3', '>=') )
+		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems in php 5.3 installations.';
+}
+else
+{
+	$errors[] = 'You don\'t seem to have IonCube Loaders installed.';
 }
 
 // Check RAM limits
@@ -238,7 +250,7 @@ if( $memLimit = @ini_get('memory_limit') )
 
 	$recLimit = (128*1024*1024);
 	if($memLimit < $recLimit)
-		$errors[] = 'Memory Limit: '.(int)($recLimit/(1024*1024)).'M is required. Please ask your host to increase this setting.';
+		$errors[] = 'Memory Limit: 128M is required. Please increase this setting.';
 }
 
 /* ----------------
@@ -273,7 +285,7 @@ if( extension_loaded('suhosin') )
 	foreach($test_false as $test)
 	{
 		if( @ini_get($test) != false )
-			$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your host does not meet this requirement.';
+			$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your server does not meet this requirement.';
 	}
 	foreach($test_values as $test)
 	{
@@ -327,18 +339,11 @@ if( $mysqlEnabled )
 
 	if( isset($server_version) && isset($client_version) )
 	{
-		if($server_version < 50000)
-		{
-			$errors[] = 'Your MySQL Version ('.mySqlVersionIntToString($server_version).') is end-of-life. Please ask your host to upgrade MySQL!';
-		}
-		elseif($server_version < 50100)
-		{
-			$errors[] = 'You are running MySQL '.mySqlVersionIntToString($server_version).', please ask your host to upgrade to MySQL 5.1!';
-		}
+		if($server_version < 50100)
+			$errors[] = 'You are running MySQL '.mySqlVersionIntToString($server_version).', please upgrade to MySQL 5.1.';
+
 		if( intAbs($server_version-$client_version) >= 1000 )
-		{
-			$errors[] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).')! Please ask your host to fix this issue.';
-		}
+			$errors[] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).').';
 	}
 }
 
@@ -359,6 +364,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 if( isset($errors) && count($errors) )
 {
 	// Errors
+	echo 'The following issues have been found, please ask your host to fix them:'
 	foreach($errors as $error)
 		echo $error.'<br />';
 }

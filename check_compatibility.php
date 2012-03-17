@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.1
-	@date    2012/03/12
+	@version 1.0.2
+	@date    2012/03/17
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -71,20 +71,17 @@ function mySqlVersionStringToInt($version)
 
 function mySqlVersionIntToString($version)
 {
+	$version_string = '';
 	$version_remain = (int)($version);
 
-	// Major  [?.x.x]
-	$version_major  = (int)($version_remain/10000) ;
-	$version_remain = (int)($version_remain-($version_major*10000));
+	foreach( array(10000,100,1) as $value)
+	{
+		$version_bit     = (int)($version_remain/$value);
+		$version_remain  = (int)($version_remain-($version_bit*$value));
+		$version_string .= $version_bit.'.';
+	}
 
-	// Medium [x.?.x]
-	$version_medium = (int)($version_remain/100);
-	$version_remain = (int)($version_remain-($version_medium*100));
-
-	// Lower  [x.x.?]
-	$version_lower  = (int)($version_remain);
-
-	return "{$version_major}.{$version_medium}.{$version_lower}";
+	return rtrim($version_string,'.');
 }
 
 /* -----------
@@ -221,7 +218,7 @@ if( function_exists('ioncube_loader_version') )
 	if( !function_exists('ioncube_loader_iversion') )
 		$errors[] = 'You have a VERY old version of IonCube Loaders which is known to cause problems.';
 
-	elseif( ioncube_loader_iversion() < 40007 && version_compare(phpversion(), '5.3', '>=') )
+	elseif( ioncube_loader_iversion() < 40007 && version_compare(PHP_VERSION, '5.3', '>=') )
 		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems in php 5.3 installations.';
 }
 else

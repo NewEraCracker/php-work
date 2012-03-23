@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.2
-	@date    2012/03/17
+	@version 1.0.3
+	@date    2012/03/22
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -110,13 +110,14 @@ foreach( $functionsToBeEnabled as $test )
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP.';
 }
 
-// Eval, Magic Quotes, Safe Mode, Output Handler, Zlib Output Compression
+// Eval, Magic Quotes, Safe Mode, Output Handler, Zlib Output Compression, Zend Engine 1 Compat Mode
 $php_checks = array(
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
-	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini, disable it for better functionality.'),
-	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode, disable the PHP safe_mode setting.'),
-	array( @ini_get('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler, disable this setting.'),
-	array( @ini_get('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled, disable this setting.'),
+	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini. Disable it for better functionality.'),
+	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
+	array( @ini_get('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
+	array( @ini_get('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
+	array( @ini_get('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This can cause some strange problems. It is strongly suggested to turn this value to Off.'),
 );
 
 foreach( $php_checks as $fail )
@@ -169,7 +170,7 @@ if( extension_loaded('curl') )
 		);
 	foreach( $curlFuctions as $test )
 		if(!function_exists($test) || in_array($test, $disabledFunctions))
-			$errors[] = $curlFound.', but function '.$test.' is disabled, please enable it.';
+			$errors[] = $curlFound.', but function '.$test.' is disabled. Please enable it.';
 
 	// We need SSL and ZLIB support
 	if( $curlVersion = @curl_version() )
@@ -332,7 +333,7 @@ if( $mysqlEnabled )
 	if( isset($server_version) && isset($client_version) )
 	{
 		if($server_version < 50100)
-			$errors[] = 'You are running MySQL '.mySqlVersionIntToString($server_version).', please upgrade to MySQL 5.1.';
+			$errors[] = 'You are running MySQL '.mySqlVersionIntToString($server_version).'. We recommend upgrading to at least MySQL 5.1.';
 
 		if( intAbs($server_version-$client_version) >= 1000 )
 			$errors[] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).').';

@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.3
-	@date    2012/03/22
+	@version 1.0.4
+	@date    2012/04/01
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -79,7 +79,7 @@ function mySqlVersionStringToInt($version)
 }
 
 /**
- * Returns the MySQL version string from a MySQL version int
+ * Returns the MySQL version string from a MySQL version integer
  */
 function mySqlVersionIntToString($version)
 {

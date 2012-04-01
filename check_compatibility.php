@@ -28,11 +28,17 @@ $mysqlPassword = '';
    Functions
    --------- */
 
+/**
+ * Returns the absolute value of integer 
+ */
 function intAbs($number)
 {
 	return (int)str_replace('-','',(string)$number);
 }
 
+/**
+ * Get the integer value of a variable
+ */
 function improvedIntVal($value)
 {
 	$value = (string)$value;
@@ -61,6 +67,9 @@ function improvedIntVal($value)
 	return (int)$value;
 }
 
+/**
+ * Returns the MySQL version integer from a MySQL version string
+ */
 function mySqlVersionStringToInt($version)
 {
 	$version = explode('.',$version);
@@ -69,6 +78,9 @@ function mySqlVersionStringToInt($version)
 	return $version;
 }
 
+/**
+ * Returns the MySQL version string from a MySQL version int
+ */
 function mySqlVersionIntToString($version)
 {
 	$version_string = '';
@@ -84,9 +96,20 @@ function mySqlVersionIntToString($version)
 	return rtrim($version_string,'.');
 }
 
-/* -----------
-   PHP Version
-   ----------- */
+/**
+ * Detects if float handling is problematic
+ */
+function is_float_problem()
+{
+    $num1 = 2009010200.01;
+    $num2 = 2009010200.02;
+
+    return ((string)$num1 === (string)$num2 || $num1 === $num2 || $num2 <= (string)$num1);
+}
+
+/* ---------
+   Check PHP
+   --------- */
 
 // Check for lower than 5.2.9
 if( version_compare(PHP_VERSION, '5.2.9', '<') )
@@ -95,10 +118,6 @@ if( version_compare(PHP_VERSION, '5.2.9', '<') )
 // If 5.3, check for lower than 5.3.5
 elseif( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
-
-/* ------------
-   PHP Settings
-   ------------ */
 
 // Functions to be enabled
 $disabledFunctions = array_map('trim', explode(',',@ini_get('disable_functions')) );
@@ -110,8 +129,9 @@ foreach( $functionsToBeEnabled as $test )
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP.';
 }
 
-// Eval, Magic Quotes, Safe Mode, Output Handler, Zlib Output Compression, Zend Engine 1 Compat Mode
+// Settings
 $php_checks = array(
+	array( is_float_problem(), 'Detected unexpected problem in handling of PHP float numbers.'),
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
 	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini. Disable it for better functionality.'),
 	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),

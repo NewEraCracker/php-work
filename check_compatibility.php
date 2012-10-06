@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.5
+	@version 1.0.6
 	@date    2012/10/06
 	@license Public Domain
 
@@ -29,7 +29,7 @@ $mysqlPassword = '';
    --------- */
 
 /**
- * Returns the absolute value of integer 
+ * Returns the absolute value of integer
  */
 function intAbs($number)
 {
@@ -115,13 +115,13 @@ function is_float_problem()
 if( version_compare(PHP_VERSION, '5.2.9', '<') )
 	$errors[] = 'PHP 5.2.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
+// If 5.4, check for lower than 5.4.5
+elseif( version_compare(PHP_VERSION, '5.4', '>=') && version_compare(PHP_VERSION, '5.4.5', '<') )
+	$errors[] = 'PHP 5.4.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
+
 // If 5.3, check for lower than 5.3.5
 elseif( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
-
-// If 5.4, check for lower than 5.4.5
-elseif( version_compare(PHP_VERSION, '5.4', '>=') && version_compare(PHP_VERSION, '5.4.5', '<') ) 
-	$errors[] = 'PHP 5.4.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // Functions to be enabled
 $disabledFunctions = array_map('trim', explode(',',@ini_get('disable_functions')) );
@@ -242,6 +242,9 @@ if( function_exists('ioncube_loader_version') )
 {
 	if( !function_exists('ioncube_loader_iversion') )
 		$errors[] = 'You have a VERY old version of IonCube Loaders which is known to cause problems.';
+
+	elseif( ioncube_loader_iversion() < 40202 && version_compare(PHP_VERSION, '5.4', '>=') )
+		$errors[] = 'You have an old version of IonCube Loaders (4.2.1 or earlier) which is known to cause problems in php 5.4 installations.';
 
 	elseif( ioncube_loader_iversion() < 40007 && version_compare(PHP_VERSION, '5.3', '>=') )
 		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems in php 5.3 installations.';

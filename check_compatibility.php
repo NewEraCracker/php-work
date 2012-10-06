@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.4
-	@date    2012/04/01
+	@version 1.0.5
+	@date    2012/10/06
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -118,6 +118,10 @@ if( version_compare(PHP_VERSION, '5.2.9', '<') )
 // If 5.3, check for lower than 5.3.5
 elseif( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
+
+// If 5.4, check for lower than 5.4.5
+elseif( version_compare(PHP_VERSION, '5.4', '>=') && version_compare(PHP_VERSION, '5.4.5', '<') ) 
+	$errors[] = 'PHP 5.4.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // Functions to be enabled
 $disabledFunctions = array_map('trim', explode(',',@ini_get('disable_functions')) );

@@ -8,7 +8,7 @@ function MemcachePrintDetails($status)
 		echo "<tr><td>Number of seconds this server has been running </td><td>".$status ["uptime"]."</td></tr>";
 
 		// Those variables might not be defined in certain systems
-		if ( isset($status ["rusage_user"]) && isset($status ["rusage_system"]) )
+		if ( isset($status ["rusage_user"], $status ["rusage_system"]) )
 		{
 			echo "<tr><td>Accumulated user time for this process </td><td>".$status ["rusage_user"]." seconds</td></tr>";
 			echo "<tr><td>Accumulated system time for this process </td><td>".$status ["rusage_system"]." seconds</td></tr>";

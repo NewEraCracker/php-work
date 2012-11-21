@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.6
-	@date    2012/10/06
+	@version 1.0.7
+	@date    2012/11/21
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -150,8 +150,15 @@ foreach( $php_checks as $fail )
 
 // Upload dir
 $upload_dir = @ini_get('upload_tmp_dir') ? @ini_get('upload_tmp_dir') : @sys_get_temp_dir();
-if( !empty($upload_dir) && !is_writable($upload_dir) )
+if( !empty($upload_dir) && !is_writable($upload_dir) ) // Make sure upload dir is writable
 	$errors[] = 'Your upload temporary directory '.htmlspecialchars($upload_dir).' is not writable. Please fix this issue.';
+
+// Session path
+$sessionpath = @session_save_path();
+if( strpos($sessionpath, ';') !== false ) // http://www.php.net/manual/en/function.session-save-path.php#50355
+	$sessionpath = substr($sessionpath, strpos($sessionpath, ';')+1);	
+if( !empty($sessionpath) && !is_writable($sessionpath) ) // Make sure session path is writable
+	$errors[] = 'Your session path '.htmlspecialchars($sessionpath).' is not writable. Please fix this issue.';
 
 // Check PHP extensions
 $required_extensions = array(

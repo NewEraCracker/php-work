@@ -21,8 +21,8 @@
 $mysqlEnabled  = true;
 $mysqlHostname = '127.0.0.1';
 $mysqlPortnum  = '3306';
-$mysqlUsername = 'root';
-$mysqlPassword = '123456';
+$mysqlUsername = '';
+$mysqlPassword = '';
 
 /* ---------
    Functions

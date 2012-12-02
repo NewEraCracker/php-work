@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.0.7
-	@date    2012/11/21
+	@version 1.1.0
+	@date    2012/12/02
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -21,8 +21,8 @@
 $mysqlEnabled  = true;
 $mysqlHostname = '127.0.0.1';
 $mysqlPortnum  = '3306';
-$mysqlUsername = '';
-$mysqlPassword = '';
+$mysqlUsername = 'root';
+$mysqlPassword = '123456';
 
 /* ---------
    Functions
@@ -107,20 +107,42 @@ function is_float_problem()
     return ((string)$num1 === (string)$num2 || $num1 === $num2 || $num2 <= (string)$num1);
 }
 
+/**
+ * Detects if timezone handling is problematic
+ */
+function is_timezone_problem()
+{
+	$status = ini_get('date.timezone');
+
+	if(!empty($status))
+	{
+		try
+		{
+			$tz = new DateTimeZone($status);
+		}
+		catch (Exception $e)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 /* ---------
    Check PHP
    --------- */
 
 // Check for lower than 5.2.9
-if( version_compare(PHP_VERSION, '5.2.9', '<') )
+if(version_compare(PHP_VERSION, '5.2.9') < 0)
 	$errors[] = 'PHP 5.2.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // If 5.4, check for lower than 5.4.5
-elseif( version_compare(PHP_VERSION, '5.4', '>=') && version_compare(PHP_VERSION, '5.4.5', '<') )
+elseif(version_compare(PHP_VERSION, '5.4') >= 0 && version_compare(PHP_VERSION, '5.4.5') < 0)
 	$errors[] = 'PHP 5.4.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // If 5.3, check for lower than 5.3.5
-elseif( version_compare(PHP_VERSION, '5.3', '>=') && version_compare(PHP_VERSION, '5.3.5', '<') )
+elseif(version_compare(PHP_VERSION, '5.3') >= 0 && version_compare(PHP_VERSION, '5.3.5') < 0)
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // Functions to be enabled
@@ -136,12 +158,13 @@ foreach( $functionsToBeEnabled as $test )
 // Settings
 $php_checks = array(
 	array( is_float_problem(), 'Detected unexpected problem in handling of PHP float numbers.'),
+	array( is_timezone_problem(), 'Invalid or empty date.timezone setting detected.'),
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
 	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini. Disable it for better functionality.'),
 	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
 	array( @ini_get('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
 	array( @ini_get('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
-	array( @ini_get('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This can cause some strange problems. It is strongly suggested to turn this value to Off.'),
+	array( @ini_get('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this value to Off.'),
 );
 
 foreach( $php_checks as $fail )
@@ -250,15 +273,27 @@ if( function_exists('ioncube_loader_version') )
 	if( !function_exists('ioncube_loader_iversion') )
 		$errors[] = 'You have a VERY old version of IonCube Loaders which is known to cause problems.';
 
-	elseif( ioncube_loader_iversion() < 40202 && version_compare(PHP_VERSION, '5.4', '>=') )
-		$errors[] = 'You have an old version of IonCube Loaders (4.2.1 or earlier) which is known to cause problems in php 5.4 installations.';
+	elseif(ioncube_loader_iversion() < 40202 && version_compare(PHP_VERSION, '5.4') >= 0)
+		$errors[] = 'You have an old version of IonCube Loaders (4.2.1 or earlier) which is known to cause problems with php 5.4.';
 
-	elseif( ioncube_loader_iversion() < 40007 && version_compare(PHP_VERSION, '5.3', '>=') )
-		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems in php 5.3 installations.';
+	elseif(ioncube_loader_iversion() < 40007 && version_compare(PHP_VERSION, '5.3') >= 0)
+		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems with php 5.3.';
 }
 else
 {
 	$errors[] = 'You do not seem to have IonCube Loaders installed.';
+}
+
+// Check eAccelerator if installed
+if( function_exists('eaccelerator_info') )
+{
+	$ea_info = eaccelerator_info();
+
+	if(version_compare($ea_info['version'], '0.9.9') <= 0)
+	{
+		// Only 1.0-dev are known to work
+		$errors[] = 'You have an old version of eAccelerator (earlier than 1.0) which is known to cause problems.';
+	}
 }
 
 // Check RAM limits

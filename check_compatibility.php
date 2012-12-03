@@ -116,26 +116,33 @@ function is_float_problem()
  */
 function is_timezone_problem()
 {
-	$status = ini_get('date.timezone');
-
-	if( !empty($status) )
+	// check if date is loaded and DateTimeZone class exists (this should be true since 5.2.0)
+	if( extension_loaded('date') && class_exists('DateTimeZone') )
 	{
-		try
+		$status = ini_get('date.timezone');
+
+		if( !empty($status) )
 		{
-			$tz = new DateTimeZone($status);
-		}
-		catch(Exception $e)
-		{
-			// timezone is invalid
-			return true;
+			try
+			{
+				$tz = new DateTimeZone($status);
+			}
+			catch(Exception $e)
+			{
+				// timezone is invalid
+				return true;
+			}
+
+			// timezone is set and working
+			return false;
 		}
 
-		// timezone is set and working
-		return false;
+		// timezone is empty
+		return true;
 	}
 
-	// timezone is empty
-	return true;
+	// extension isn't loaded so we don't check
+	return false;
 }
 
 /**
@@ -170,6 +177,8 @@ function phpXmlBugTester()
 		$xmlBugTester = new XmlBugTester();
 		return $xmlBugTester->bad;
 	}
+
+	// extension isn't loaded so we don't check
 	return false;
 }
 

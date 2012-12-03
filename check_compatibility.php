@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.1.0
-	@date    2012/12/02
+	@version 1.2.0
+	@date    2012/12/03
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -24,9 +24,9 @@ $mysqlPortnum  = '3306';
 $mysqlUsername = '';
 $mysqlPassword = '';
 
-/* ---------
-   Functions
-   --------- */
+/* --------------------------
+   Functions for calculations
+   -------------------------- */
 
 /**
  * Returns the absolute value of integer
@@ -96,6 +96,10 @@ function mySqlVersionIntToString($version)
 	return rtrim($version_string,'.');
 }
 
+/* -------------------
+   Functions for tests
+   ------------------- */
+
 /**
  * Detects if float handling is problematic
  */
@@ -129,6 +133,74 @@ function is_timezone_problem()
 	return false;
 }
 
+/**
+ * Test for PHP+libxml2 bug which breaks XML input subtly with certain versions.
+ * Known fixed with PHP 5.2.9 + libxml2-2.7.3
+ * @see http://bugs.php.net/bug.php?id=45996
+ */
+function phpXmlBugTester()
+{
+	if( extension_loaded('xml') )
+	{
+		class XmlBugTester
+		{
+			private $parsedData = '';
+			public $bad = true;
+
+			public function __construct()
+			{
+				$charData = '<b>c</b>';
+				$xml = '<a>' . htmlspecialchars( $charData ) . '</a>';
+
+				$parser = xml_parser_create();
+				xml_set_character_data_handler( $parser, array( $this, 'chardata' ) );
+				$parsedOk = xml_parse( $parser, $xml, true );
+				$this->bad = ( !$parsedOk || ($this->parsedData != $charData) );
+			}
+			public function chardata( $parser, $data )
+			{
+				$this->parsedData .= $data;
+			}
+		}
+		$xmlBugTester = new XmlBugTester();
+		return $xmlBugTester->bad;
+	}
+	return false;
+}
+
+/**
+ * Test for PHP bug #50394 (PHP 5.3.x conversion to null only, not 5.2.x)
+ * @see http://bugs.php.net/bug.php?id=50394
+ */
+function phpRefCallBugTester()
+{
+	class RefCallBugTester
+	{
+		public $bad = true;
+
+		function __call( $name, $args )
+		{
+			$old = error_reporting( E_ALL & ~E_WARNING );
+			call_user_func_array( array( $this, 'checkForBrokenRef' ), $args );
+			error_reporting( $old );
+		}
+		function checkForBrokenRef( &$var )
+		{
+			if( $var )
+				$this->bad = false;
+		}
+		function execute()
+		{
+			$var = true;
+			call_user_func_array( array( $this, 'foo' ), array( &$var ) );
+		}
+	}
+
+	$refCallBugTester = new RefCallBugTester();
+	$refCallBugTester->execute();
+	return $refCallBugTester->bad;
+}
+
 /* ---------
    Check PHP
    --------- */
@@ -159,6 +231,8 @@ foreach( $functionsToBeEnabled as $test )
 $php_checks = array(
 	array( is_float_problem(), 'Detected unexpected problem in handling of PHP float numbers.'),
 	array( is_timezone_problem(), 'Invalid or empty date.timezone setting detected.'),
+	array( phpXmlBugTester(), 'A bug has been detected in PHP+libxml2 which breaks XML input subtly.'),
+	array( phpRefCallBugTester(), 'A regression (bug #50394) has been detected in your PHP version. Please upgrade or downgrade your PHP installation.'),
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
 	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini. Disable it for better functionality.'),
 	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),

@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.2.0
+	@version 1.2.1
 	@date    2012/12/03
 	@license Public Domain
 
@@ -118,19 +118,24 @@ function is_timezone_problem()
 {
 	$status = ini_get('date.timezone');
 
-	if(!empty($status))
+	if( !empty($status) )
 	{
 		try
 		{
 			$tz = new DateTimeZone($status);
 		}
-		catch (Exception $e)
+		catch(Exception $e)
 		{
+			// timezone is invalid
 			return true;
 		}
+
+		// timezone is set and working
+		return false;
 	}
 
-	return false;
+	// timezone is empty
+	return true;
 }
 
 /**
@@ -195,7 +200,6 @@ function phpRefCallBugTester()
 			call_user_func_array( array( $this, 'foo' ), array( &$var ) );
 		}
 	}
-
 	$refCallBugTester = new RefCallBugTester();
 	$refCallBugTester->execute();
 	return $refCallBugTester->bad;

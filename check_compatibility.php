@@ -411,7 +411,7 @@ if( extension_loaded('suhosin') )
 	$test_values = array(
 		array( 'suhosin.get.max_name_length', 512 ),
 		array( 'suhosin.get.max_totalname_length', 512 ),
-		array( 'suhosin.get.max_value_length', 1024 ),
+		array( 'suhosin.get.max_value_length', 2000 ),
 		array( 'suhosin.post.max_array_index_length', 256 ),
 		array( 'suhosin.post.max_name_length', 512 ),
 		array( 'suhosin.post.max_totalname_length', 8192 ),

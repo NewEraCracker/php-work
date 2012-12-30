@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.2.1
-	@date    2012/12/03
+	@version 1.2.2
+	@date    2012/12/30
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -146,6 +146,21 @@ function is_timezone_problem()
 }
 
 /**
+ * Detects if input variables handling is problematic
+ */
+function is_max_input_vars_problem()
+{
+	// max_input_vars was introduced in PHP 5.3.9
+	if( version_compare(PHP_VERSION, '5.3.9') >= 0 )
+	{
+		return (@ini_get('max_input_vars') < 4096);
+	}
+
+	// less than PHP 5.3.9, no problem here
+	return false;
+}
+
+/**
  * Test for PHP+libxml2 bug which breaks XML input subtly with certain versions.
  * Known fixed with PHP 5.2.9 + libxml2-2.7.3
  * @see http://bugs.php.net/bug.php?id=45996
@@ -244,6 +259,7 @@ foreach( $functionsToBeEnabled as $test )
 $php_checks = array(
 	array( is_float_problem(), 'Detected unexpected problem in handling of PHP float numbers.'),
 	array( is_timezone_problem(), 'Invalid or empty date.timezone setting detected.'),
+	array( is_max_input_vars_problem(), 'Problematic max_input_vars setting detected, please set it to 4096 or higher.'),
 	array( phpXmlBugTester(), 'A bug has been detected in PHP+libxml2 which breaks XML input subtly.'),
 	array( phpRefCallBugTester(), 'A regression (bug #50394) has been detected in your PHP version. Please upgrade or downgrade your PHP installation.'),
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
@@ -361,10 +377,10 @@ if( function_exists('ioncube_loader_version') )
 		$errors[] = 'You have a VERY old version of IonCube Loaders which is known to cause problems.';
 
 	elseif(ioncube_loader_iversion() < 40202 && version_compare(PHP_VERSION, '5.4') >= 0)
-		$errors[] = 'You have an old version of IonCube Loaders (4.2.1 or earlier) which is known to cause problems with php 5.4.';
+		$errors[] = 'You have an old version of IonCube Loaders (4.2.1 or earlier) which is known to cause problems with PHP 5.4.';
 
 	elseif(ioncube_loader_iversion() < 40007 && version_compare(PHP_VERSION, '5.3') >= 0)
-		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems with php 5.3.';
+		$errors[] = 'You have an old version of IonCube Loaders (4.0.6 or earlier) which is known to cause problems with PHP 5.3.';
 }
 else
 {

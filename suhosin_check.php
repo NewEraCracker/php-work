@@ -2,8 +2,8 @@
 /*
 	Suhosin Configuration Checker
 	@author  NewEraCracker
-	@version 0.5.4
-	@date    2012/01/03
+	@version 0.5.5
+	@date    2012/12/30
 	@license Public Domain
 */
 

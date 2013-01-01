@@ -2,8 +2,8 @@
 /*
 	Suhosin Configuration Checker
 	@author  NewEraCracker
-	@version 0.5.5
-	@date    2012/12/30
+	@version 0.5.6
+	@date    2013/01/01
 	@license Public Domain
 */
 
@@ -15,7 +15,7 @@
 $test_values = array(
 	array( 'suhosin.get.max_name_length', 512 ),
 	array( 'suhosin.get.max_totalname_length', 512 ), 
-	array( 'suhosin.get.max_value_length', 2000 ), 
+	array( 'suhosin.get.max_value_length', 2048 ), 
 	array( 'suhosin.post.max_array_index_length', 256 ),
 	array( 'suhosin.post.max_name_length', 512 ),
 	array( 'suhosin.post.max_totalname_length', 8192 ),
@@ -74,5 +74,4 @@ foreach($problems as $problem)
 	echo $problem."\r\n";
 
 echo "</pre>";
-
 ?>

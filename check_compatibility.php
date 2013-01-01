@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.2.2
-	@date    2012/12/30
+	@version 1.2.3
+	@date    2013/01/01
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -427,7 +427,7 @@ if( extension_loaded('suhosin') )
 	$test_values = array(
 		array( 'suhosin.get.max_name_length', 512 ),
 		array( 'suhosin.get.max_totalname_length', 512 ),
-		array( 'suhosin.get.max_value_length', 2000 ),
+		array( 'suhosin.get.max_value_length', 2048 ),
 		array( 'suhosin.post.max_array_index_length', 256 ),
 		array( 'suhosin.post.max_name_length', 512 ),
 		array( 'suhosin.post.max_totalname_length', 8192 ),
@@ -542,3 +542,4 @@ else
 // Footer
 echo '</body>
 </html>';
+?>

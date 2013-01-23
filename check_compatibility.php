@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.3.0
+	@version 1.3.1
 	@date    2013/01/23
 	@license Public Domain
 
@@ -21,7 +21,7 @@
 // MySQL settings
 $mysql_enable_check = true;
 $mysql_host = '127.0.0.1';
-$mysql_port  = '3306';
+$mysql_port = '3306';
 $mysql_username = '';
 $mysql_password = '';
 

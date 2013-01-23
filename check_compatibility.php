@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.2.4
+	@version 1.2.5
 	@date    2013/01/23
 	@license Public Domain
 
@@ -263,7 +263,7 @@ $php_checks = array(
 	array( phpXmlBugTester(), 'A bug has been detected in PHP+libxml2 which breaks XML input.'),
 	array( phpRefCallBugTester(), 'A regression (bug #50394) has been detected in your PHP version. Please upgrade or downgrade your PHP installation.'),
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
-	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini. Disable it for better functionality.'),
+	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'Setting magic_quotes_gpc has been found enabled in your php.ini. Disable it for better functionality.'),
 	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
 	array( @ini_get('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
 	array( @ini_get('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
@@ -368,6 +368,18 @@ if( function_exists('gd_info') )
 
 	if( ! @$gdInfo['FreeType Support'] )
 		$errors[] = $gdFound.', but FreeType support is missing. Please add support for this.';
+}
+
+// Check Session
+if( extension_loaded('session') )
+{
+	$sessionFound = 'The required PHP extension "Session" was found';
+
+	if( @ini_get('session.use_trans_sid') != 0 )
+		$errors[] = $sessionFound.', but session.use_trans_sid is enabled. Please disable this setting for security reasons.';
+
+	if( @ini_get('session.use_only_cookies') != 1)
+		$errors[] = $sessionFound.', but session.use_only_cookies is disabled. Please enable this setting for security reasons.';
 }
 
 // Check Ioncube

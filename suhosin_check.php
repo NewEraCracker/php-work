@@ -2,8 +2,8 @@
 /*
 	Suhosin Configuration Checker
 	@author  NewEraCracker
-	@version 0.5.6
-	@date    2013/01/01
+	@version 0.5.7
+	@date    2013/01/23
 	@license Public Domain
 */
 
@@ -25,14 +25,15 @@ $test_values = array(
 	array( 'suhosin.request.max_totalname_length', 8192 ),
 	array( 'suhosin.request.max_vars', 4096 ),
 	array( 'suhosin.request.max_value_length', 1000000 ),
-	array( 'suhosin.request.max_varname_length', 512 ),
+	array( 'suhosin.request.max_varname_length', 512 )
 );
 
-// Value has to be false to pass tests
+// Value has to be false or zero to pass tests
 $test_false = array(
+	'suhosin.mail.protect',
 	'suhosin.sql.bailout_on_error',
 	'suhosin.cookie.encrypt',
-	'suhosin.session.encrypt',
+	'suhosin.session.encrypt'
 );
 
 /* ---------

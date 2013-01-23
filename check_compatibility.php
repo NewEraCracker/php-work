@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.2.3
-	@date    2013/01/01
+	@version 1.2.4
+	@date    2013/01/23
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -260,7 +260,7 @@ $php_checks = array(
 	array( is_float_problem(), 'Detected unexpected problem in handling of PHP float numbers.'),
 	array( is_timezone_problem(), 'Invalid or empty date.timezone setting detected.'),
 	array( is_max_input_vars_problem(), 'Problematic max_input_vars setting detected, please set it to 4096 or higher.'),
-	array( phpXmlBugTester(), 'A bug has been detected in PHP+libxml2 which breaks XML input subtly.'),
+	array( phpXmlBugTester(), 'A bug has been detected in PHP+libxml2 which breaks XML input.'),
 	array( phpRefCallBugTester(), 'A regression (bug #50394) has been detected in your PHP version. Please upgrade or downgrade your PHP installation.'),
 	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
 	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc is enabled in your php.ini. Disable it for better functionality.'),
@@ -437,14 +437,15 @@ if( extension_loaded('suhosin') )
 		array( 'suhosin.request.max_totalname_length', 8192 ),
 		array( 'suhosin.request.max_vars', 4096 ),
 		array( 'suhosin.request.max_value_length', 1000000 ),
-		array( 'suhosin.request.max_varname_length', 512 ),
+		array( 'suhosin.request.max_varname_length', 512 )
 	);
 
-	// Value has to be false to pass tests
+	// Value has to be false or zero to pass tests
 	$test_false = array(
+		'suhosin.mail.protect',
 		'suhosin.sql.bailout_on_error',
 		'suhosin.cookie.encrypt',
-		'suhosin.session.encrypt',
+		'suhosin.session.encrypt'
 	);
 
 	foreach($test_false as $test)

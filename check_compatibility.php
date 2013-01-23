@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.2.5
+	@version 1.3.0
 	@date    2013/01/23
 	@license Public Domain
 
@@ -18,11 +18,15 @@
    Configuration
    ------------- */
 
-$mysqlEnabled  = true;
-$mysqlHostname = '127.0.0.1';
-$mysqlPortnum  = '3306';
-$mysqlUsername = '';
-$mysqlPassword = '';
+// MySQL settings
+$mysql_enable_check = true;
+$mysql_host = '127.0.0.1';
+$mysql_port  = '3306';
+$mysql_username = '';
+$mysql_password = '';
+
+// Session settings
+$session_enable_extended_check = true;
 
 /* --------------------------
    Functions for calculations
@@ -375,11 +379,20 @@ if( extension_loaded('session') )
 {
 	$sessionFound = 'The required PHP extension "Session" was found';
 
-	if( @ini_get('session.use_trans_sid') != 0 )
+	if( @ini_get('session.use_trans_sid') )
 		$errors[] = $sessionFound.', but session.use_trans_sid is enabled. Please disable this setting for security reasons.';
 
-	if( @ini_get('session.use_only_cookies') != 1)
+	if( ! @ini_get('session.use_only_cookies') )
 		$errors[] = $sessionFound.', but session.use_only_cookies is disabled. Please enable this setting for security reasons.';
+
+	if( $session_enable_extended_check )
+	{
+		if( @ini_get('session.hash_bits_per_character') < 5 )
+			$errors[] = $sessionFound.', but session.hash_bits_per_character is set to a low value. Please set it to 5 for security reasons.';
+
+		if( ! @ini_get('session.hash_function') )
+			$errors[] = $sessionFound.', but session.hash_function is set to a weak value. Please set it to 1 for security reasons.';
+	}
 }
 
 // Check Ioncube
@@ -478,14 +491,14 @@ if( extension_loaded('suhosin') )
 /* -------------
    MySQL Version
    ------------- */
-if( $mysqlEnabled )
+if( $mysql_enable_check )
 {
 	// Just to be sure :)
-	$mysqlPortnum = (int)$mysqlPortnum;
+	$mysql_port = (int)$mysql_port;
 
 	if( function_exists('mysqli_connect') )
 	{
-		$mysqli = @mysqli_connect($mysqlHostname,$mysqlUsername,$mysqlPassword,'',$mysqlPortnum);
+		$mysqli = @mysqli_connect($mysql_host,$mysql_username,$mysql_password,'',$mysql_port);
 
 		if(!$mysqli)
 		{
@@ -500,8 +513,8 @@ if( $mysqlEnabled )
 	}
 	elseif( function_exists('mysql_connect') )
 	{
-		$mysqlHostname = $mysqlHostname.':'.$mysqlPortnum;
-		$mysql = @mysql_connect($mysqlHostname,$mysqlUsername,$mysqlPassword);
+		$mysql_host = $mysql_host.':'.$mysql_port;
+		$mysql = @mysql_connect($mysql_host,$mysql_username,$mysql_password);
 
 		if(!$mysql)
 		{

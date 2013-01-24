@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.3.1
-	@date    2013/01/23
+	@version 1.3.2
+	@date    2013/01/24
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -448,8 +448,19 @@ if( $memLimit = @ini_get('memory_limit') )
    ---------------- */
 if( extension_loaded('suhosin') )
 {
+	// Value has to be false or zero to pass tests
+	$test_false = array(
+		'suhosin.mail.protect',
+		'suhosin.sql.bailout_on_error',
+		'suhosin.cookie.encrypt',
+		'suhosin.session.encrypt'
+	);
+
 	// Value has to be the same or higher to pass tests
 	$test_values = array(
+		array( 'suhosin.cookie.max_name_length', 64),
+		array( 'suhosin.cookie.max_totalname_length', 256),
+		array( 'suhosin.cookie.max_value_length', 10000),
 		array( 'suhosin.get.max_name_length', 512 ),
 		array( 'suhosin.get.max_totalname_length', 512 ),
 		array( 'suhosin.get.max_value_length', 2048 ),
@@ -464,26 +475,39 @@ if( extension_loaded('suhosin') )
 		array( 'suhosin.request.max_value_length', 1000000 ),
 		array( 'suhosin.request.max_varname_length', 512 )
 	);
-
-	// Value has to be false or zero to pass tests
-	$test_false = array(
-		'suhosin.mail.protect',
-		'suhosin.sql.bailout_on_error',
-		'suhosin.cookie.encrypt',
-		'suhosin.session.encrypt'
+	
+	// Value has to be zero (protection disabled) or higher than x to pass
+	$test_zero_or_higher_than_value = array(
+		array( 'suhosin.executor.max_depth', 10000),
+		array( 'suhosin.executor.include.max_traversal', 6),
 	);
 
 	foreach($test_false as $test)
 	{
-		if( @ini_get($test) != false )
-			$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your server does not meet this requirement.';
+		if( @ini_get($test) )
+		{
+			if( $test == 'suhosin.mail.protect' )
+				$errors[] = $test.' is required to be set to 0 (zero) in php.ini. Your server does not meet this requirement.';
+			else
+				$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your server does not meet this requirement.';
+		}
 	}
+
 	foreach($test_values as $test)
 	{
 		if( isset($test['0']) && isset($test['1']) )
 		{
-			if( @ini_get($test['0']) < $test['1'])
+			if( @ini_get($test['0']) < $test['1'] )
 				$errors[] = 'It is required that <b>'.$test['0'].'</b> is set to <b>'.$test['1'].'</b> or higher.';
+		}
+	}
+
+	foreach($test_zero_or_higher_than_value as $test)
+	{
+		if( @ini_get($test['0']) )
+		{
+			if( @ini_get($test['0']) < $test['1'] )
+				$errors[] = 'It is required that <b>'.$test['0'].'</b> is set to either 0 (zero), <b>'.$test['1'].'</b> or higher.';
 		}
 	}
 }

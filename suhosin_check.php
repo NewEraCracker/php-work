@@ -2,7 +2,7 @@
 /*
 	Suhosin Configuration Checker
 	@author  NewEraCracker
-	@version 0.6.0
+	@version 0.6.1
 	@date    2013/01/24
 	@license Public Domain
 */
@@ -39,7 +39,7 @@ $test_values = array(
 	array( 'suhosin.request.max_varname_length', 512 )
 );
 
-// Value has to be zero (protection disabled) or higher than x to pass
+// Value has to be zero (protection disabled), equal or higher than x to pass
 $test_zero_or_higher_than_value = array(
 	array( 'suhosin.executor.max_depth', 10000),
 	array( 'suhosin.executor.include.max_traversal', 6),
@@ -64,7 +64,7 @@ else
 		if( @ini_get($test) )
 		{
 			if( $test == 'suhosin.mail.protect' )
-				$problems[] = $test.' is required to be set to 0 (zero) in php.ini. Your server does not meet this requirement.';
+				$problems[] = $test.' is required to be set to <b>0 (zero)</b> in php.ini. Your server does not meet this requirement.';
 			else
 				$problems[] = $test.' is required to be set to <b>off</b> in php.ini. Your server does not meet this requirement.';
 		}

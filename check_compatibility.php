@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.3.2
+	@version 1.4.0
 	@date    2013/01/24
 	@license Public Domain
 
@@ -476,7 +476,7 @@ if( extension_loaded('suhosin') )
 		array( 'suhosin.request.max_varname_length', 512 )
 	);
 	
-	// Value has to be zero (protection disabled) or higher than x to pass
+	// Value has to be zero (protection disabled), equal or higher than x to pass
 	$test_zero_or_higher_than_value = array(
 		array( 'suhosin.executor.max_depth', 10000),
 		array( 'suhosin.executor.include.max_traversal', 6),
@@ -487,7 +487,7 @@ if( extension_loaded('suhosin') )
 		if( @ini_get($test) )
 		{
 			if( $test == 'suhosin.mail.protect' )
-				$errors[] = $test.' is required to be set to 0 (zero) in php.ini. Your server does not meet this requirement.';
+				$errors[] = $test.' is required to be set to <b>0 (zero)</b> in php.ini. Your server does not meet this requirement.';
 			else
 				$errors[] = $test.' is required to be set to <b>off</b> in php.ini. Your server does not meet this requirement.';
 		}

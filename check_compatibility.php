@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 1.4.0
-	@date    2013/01/24
+	@version 2.0.0
+	@date    2013/02/19
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -28,6 +28,12 @@ $mysql_password = '';
 // Session settings
 $session_enable_extended_check = true;
 
+/* ----------------
+   Global variables
+   ---------------- */
+
+$errors = array();
+
 /* --------------------------
    Functions for calculations
    -------------------------- */
@@ -38,6 +44,18 @@ $session_enable_extended_check = true;
 function intAbs($number)
 {
 	return (int)str_replace('-','',(string)$number);
+}
+
+/**
+ * Return the value of a PHP configuration option
+ */
+function improvedIniGet($varname)
+{
+	if( function_exists('ini_get') )
+		return @ini_get($varname);
+
+	if( function_exists('get_cfg_var') )
+		return @get_cfg_var($varname);
 }
 
 /**
@@ -105,14 +123,88 @@ function mySqlVersionIntToString($version)
    ------------------- */
 
 /**
+ * Detects if ini parser handling is problematic
+ */
+function is_ini_parser_problem($disabled_functions)
+{
+	// Function available since PHP 4
+	$ini_parser_functions = array('parse_ini_file');
+
+	// Function available since PHP 5.3
+	if( version_compare(PHP_VERSION, '5.3') >= 0 )
+		$ini_parser_functions = array_merge($ini_parser_functions, array('parse_ini_string'));
+
+	// Problem counter
+	$problem = 0;
+
+	// Default error message
+	$error_message = 'Problematic ini parser detected, make sure ';
+
+	// Test it
+	foreach( $ini_parser_functions as $function )
+	{
+		if( !function_exists($function) || in_array($function, $disabled_functions) )
+		{
+			// Add problematic function to message
+			$error_message .= ($problem == 0 ? '' : 'and ').$function.' ';
+
+			// Increment problem counter
+			++$problem;
+		}
+	}
+
+	// Generate message if error occurs.
+	switch($problem)
+	{
+		case 0:
+			return null;
+		case 1:
+			$error_message .= 'function exist and is enabled.';
+			break;
+		default:
+			$error_message .= 'functions exist and are enabled.';
+			break;
+	}
+
+	return $error_message;
+}
+
+/**
  * Detects if float handling is problematic
  */
 function is_float_problem()
 {
-    $num1 = 2009010200.01;
-    $num2 = 2009010200.02;
+	$num1 = 2009010200.01;
+	$num2 = 2009010200.02;
 
-    return ((string)$num1 === (string)$num2 || $num1 === $num2 || $num2 <= (string)$num1);
+	if((string)$num1 === (string)$num2 || $num1 === $num2 || $num2 <= (string)$num1)
+		return 'Detected unexpected problem in handling of PHP float numbers.';
+
+	return null;
+}
+
+/**
+ * Detects if input variables handling is problematic
+ */
+function is_max_input_vars_problem()
+{
+	// max_input_vars was introduced in PHP 5.3.9
+	if( version_compare(PHP_VERSION, '5.3.9') >= 0 && (improvedIniGet('max_input_vars') < 4096) )
+		return 'Problematic max_input_vars setting detected, please set it to 4096 or higher.';
+
+	// less than PHP 5.3.9, no problem here
+	return null;
+}
+
+/**
+ * Detects if mbstring extension is problematic
+ */
+function is_mbstring_problem()
+{
+	if( extension_loaded('mbstring') && improvedIniGet('mbstring.func_overload') )
+		return 'Extension Multibyte String may break data when mbstring.func_overload setting is enabled. Please disable this setting.';
+
+	return null;
 }
 
 /**
@@ -123,7 +215,8 @@ function is_timezone_problem()
 	// check if date is loaded and DateTimeZone class exists (this should be true since 5.2.0)
 	if( extension_loaded('date') && class_exists('DateTimeZone') )
 	{
-		$status = ini_get('date.timezone');
+		$error_message = 'Invalid or empty date.timezone setting detected.';
+		$status = improvedIniGet('date.timezone');
 
 		if( !empty($status) )
 		{
@@ -134,34 +227,19 @@ function is_timezone_problem()
 			catch(Exception $e)
 			{
 				// timezone is invalid
-				return true;
+				return $error_message;
 			}
 
 			// timezone is set and working
-			return false;
+			return null;
 		}
 
 		// timezone is empty
-		return true;
+		return $error_message;
 	}
 
 	// extension isn't loaded so we don't check
-	return false;
-}
-
-/**
- * Detects if input variables handling is problematic
- */
-function is_max_input_vars_problem()
-{
-	// max_input_vars was introduced in PHP 5.3.9
-	if( version_compare(PHP_VERSION, '5.3.9') >= 0 )
-	{
-		return (@ini_get('max_input_vars') < 4096);
-	}
-
-	// less than PHP 5.3.9, no problem here
-	return false;
+	return null;
 }
 
 /**
@@ -173,6 +251,8 @@ function phpXmlBugTester()
 {
 	if( extension_loaded('xml') )
 	{
+		$error_message = 'A bug has been detected in PHP+libxml2 which breaks XML input.';
+
 		class XmlBugTester
 		{
 			private $parsedData = '';
@@ -193,12 +273,15 @@ function phpXmlBugTester()
 				$this->parsedData .= $data;
 			}
 		}
+
 		$xmlBugTester = new XmlBugTester();
-		return $xmlBugTester->bad;
+
+		if($xmlBugTester->bad)
+			return $error_message;
 	}
 
 	// extension isn't loaded so we don't check
-	return false;
+	return null;
 }
 
 /**
@@ -207,6 +290,8 @@ function phpXmlBugTester()
  */
 function phpRefCallBugTester()
 {
+	$error_message = 'A regression (bug #50394) has been detected in your PHP version. Please upgrade or downgrade your PHP installation.';
+
 	class RefCallBugTester
 	{
 		public $bad = true;
@@ -230,7 +315,11 @@ function phpRefCallBugTester()
 	}
 	$refCallBugTester = new RefCallBugTester();
 	$refCallBugTester->execute();
-	return $refCallBugTester->bad;
+
+	if($refCallBugTester->bad)
+		return $error_message;
+
+	return null;
 }
 
 /* ---------
@@ -250,43 +339,57 @@ elseif(version_compare(PHP_VERSION, '5.3') >= 0 && version_compare(PHP_VERSION, 
 	$errors[] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 // Functions to be enabled
-$disabledFunctions = array_map('trim', explode(',',@ini_get('disable_functions')) );
-$disabledFunctions = array_merge($disabledFunctions, array_map('trim', explode(',',@ini_get('suhosin.executor.func.blacklist'))) );
-$functionsToBeEnabled = array('php_uname', 'base64_decode', 'fpassthru', 'ini_set', 'ini_get');
-foreach( $functionsToBeEnabled as $test )
+$disabled_functions = array_map('trim', explode(',',improvedIniGet('disable_functions')) );
+$disabled_functions = array_merge($disabled_functions, array_map('trim', explode(',',improvedIniGet('suhosin.executor.func.blacklist'))));
+$functions_required = array('php_uname', 'base64_decode', 'fpassthru', 'get_cfg_var', 'ini_set', 'ini_get');
+foreach( $functions_required as $test )
 {
-	if( !function_exists($test) || in_array($test, $disabledFunctions) )
+	if( !function_exists($test) || in_array($test, $disabled_functions) )
 		$errors[] = 'Function '.$test.' is required to be enabled in PHP.';
 }
 
 // Settings
 $php_checks = array(
-	array( is_float_problem(), 'Detected unexpected problem in handling of PHP float numbers.'),
-	array( is_timezone_problem(), 'Invalid or empty date.timezone setting detected.'),
-	array( is_max_input_vars_problem(), 'Problematic max_input_vars setting detected, please set it to 4096 or higher.'),
-	array( phpXmlBugTester(), 'A bug has been detected in PHP+libxml2 which breaks XML input.'),
-	array( phpRefCallBugTester(), 'A regression (bug #50394) has been detected in your PHP version. Please upgrade or downgrade your PHP installation.'),
-	array( in_array('eval',$disabledFunctions), 'Language construct eval is required to be enabled in PHP.'),
-	array( @ini_get('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'Setting magic_quotes_gpc has been found enabled in your php.ini. Disable it for better functionality.'),
-	array( @ini_get('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
-	array( @ini_get('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
-	array( @ini_get('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
-	array( @ini_get('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this value to Off.'),
+	is_ini_parser_problem($disabled_functions),
+	is_float_problem(),
+	is_max_input_vars_problem(),
+	is_mbstring_problem(),
+	is_timezone_problem(),
+	phpXmlBugTester(),
+	phpRefCallBugTester(),
+	array( in_array('eval',$disabled_functions), 'Language construct eval is required to be enabled in PHP.'),
+	array( improvedIniGet('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'Setting magic_quotes_gpc has been found enabled in your php.ini. Disable it for better functionality.'),
+	array( improvedIniGet('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
+	array( improvedIniGet('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
+	array( improvedIniGet('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
+	array( improvedIniGet('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this value to Off.'),
 );
 
-foreach( $php_checks as $fail )
-	if( $fail[0] )
-		$errors[] = $fail[1];
+foreach( $php_checks as $test )
+{
+	if( is_array($test) )
+	{
+		// For tests that return true if error
+		if($test[0])
+			$errors[] = $test[1];
+	}
+	else
+	{
+		// For tests that return error message
+		if($test != null)
+			$errors[] = $test;
+	}
+}
 
 // Upload dir
-$upload_dir = @ini_get('upload_tmp_dir') ? @ini_get('upload_tmp_dir') : @sys_get_temp_dir();
+$upload_dir = improvedIniGet('upload_tmp_dir') ? improvedIniGet('upload_tmp_dir') : @sys_get_temp_dir();
 if( !empty($upload_dir) && !is_writable($upload_dir) ) // Make sure upload dir is writable
 	$errors[] = 'Your upload temporary directory '.htmlspecialchars($upload_dir).' is not writable. Please fix this issue.';
 
 // Session path
 $sessionpath = @session_save_path();
 if( strpos($sessionpath, ';') !== false ) // http://www.php.net/manual/en/function.session-save-path.php#50355
-	$sessionpath = substr($sessionpath, strpos($sessionpath, ';')+1);	
+	$sessionpath = substr($sessionpath, strpos($sessionpath, ';')+1);
 if( !empty($sessionpath) && !is_writable($sessionpath) ) // Make sure session path is writable
 	$errors[] = 'Your session path '.htmlspecialchars($sessionpath).' is not writable. Please fix this issue.';
 
@@ -330,7 +433,7 @@ if( extension_loaded('curl') )
 		'curl_setopt_array', 'curl_setopt', 'curl_version',
 		);
 	foreach( $curlFuctions as $test )
-		if(!function_exists($test) || in_array($test, $disabledFunctions))
+		if(!function_exists($test) || in_array($test, $disabled_functions))
 			$errors[] = $curlFound.', but function '.$test.' is disabled. Please enable it.';
 
 	// We need SSL and ZLIB support
@@ -379,18 +482,18 @@ if( extension_loaded('session') )
 {
 	$sessionFound = 'The required PHP extension "Session" was found';
 
-	if( @ini_get('session.use_trans_sid') )
+	if( improvedIniGet('session.use_trans_sid') )
 		$errors[] = $sessionFound.', but session.use_trans_sid is enabled. Please disable this setting for security reasons.';
 
-	if( ! @ini_get('session.use_only_cookies') )
+	if( ! improvedIniGet('session.use_only_cookies') )
 		$errors[] = $sessionFound.', but session.use_only_cookies is disabled. Please enable this setting for security reasons.';
 
 	if( $session_enable_extended_check )
 	{
-		if( @ini_get('session.hash_bits_per_character') < 5 )
+		if( improvedIniGet('session.hash_bits_per_character') < 5 )
 			$errors[] = $sessionFound.', but session.hash_bits_per_character is set to a low value. Please set it to 5 for security reasons.';
 
-		if( ! @ini_get('session.hash_function') )
+		if( ! improvedIniGet('session.hash_function') )
 			$errors[] = $sessionFound.', but session.hash_function is set to a weak value. Please set it to 1 for security reasons.';
 	}
 }
@@ -425,7 +528,7 @@ if( function_exists('eaccelerator_info') )
 }
 
 // Check RAM limits
-if( $memLimit = @ini_get('memory_limit') )
+if( $memLimit = improvedIniGet('memory_limit') )
 {
 	$memLimit = trim($memLimit);
 	$last = strtolower($memLimit[strlen($memLimit)-1]);
@@ -475,7 +578,7 @@ if( extension_loaded('suhosin') )
 		array( 'suhosin.request.max_value_length', 1000000 ),
 		array( 'suhosin.request.max_varname_length', 512 )
 	);
-	
+
 	// Value has to be zero (protection disabled), equal or higher than x to pass
 	$test_zero_or_higher_than_value = array(
 		array( 'suhosin.executor.max_depth', 10000),
@@ -484,7 +587,7 @@ if( extension_loaded('suhosin') )
 
 	foreach($test_false as $test)
 	{
-		if( @ini_get($test) )
+		if( improvedIniGet($test) )
 		{
 			if( $test == 'suhosin.mail.protect' )
 				$errors[] = $test.' is required to be set to <b>0 (zero)</b> in php.ini. Your server does not meet this requirement.';
@@ -497,16 +600,16 @@ if( extension_loaded('suhosin') )
 	{
 		if( isset($test['0']) && isset($test['1']) )
 		{
-			if( @ini_get($test['0']) < $test['1'] )
+			if( improvedIniGet($test['0']) < $test['1'] )
 				$errors[] = 'It is required that <b>'.$test['0'].'</b> is set to <b>'.$test['1'].'</b> or higher.';
 		}
 	}
 
 	foreach($test_zero_or_higher_than_value as $test)
 	{
-		if( @ini_get($test['0']) )
+		if( improvedIniGet($test['0']) )
 		{
-			if( @ini_get($test['0']) < $test['1'] )
+			if( improvedIniGet($test['0']) < $test['1'] )
 				$errors[] = 'It is required that <b>'.$test['0'].'</b> is set to either 0 (zero), <b>'.$test['1'].'</b> or higher.';
 		}
 	}

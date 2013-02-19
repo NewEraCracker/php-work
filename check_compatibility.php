@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 2.0.0
+	@version 2.0.1
 	@date    2013/02/19
 	@license Public Domain
 
@@ -78,8 +78,7 @@ function improvedIntVal($value)
 		}
 		elseif($found)
 		{
-			// We already have numbers
-			// and we don't like trash.
+			// We already have numbers and we don't like trash.
 			break;
 		}
 	}
@@ -153,7 +152,7 @@ function is_ini_parser_problem($disabled_functions)
 		}
 	}
 
-	// Generate message if error occurs.
+	// Generate message if problem is detected
 	switch($problem)
 	{
 		case 0:

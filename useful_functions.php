@@ -1,7 +1,8 @@
 <?php
-/* Author: NewEraCracker
- * License: Public Domain
- */
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
 
 function readdir_recursive($dir, $show_dirs=false)
 {

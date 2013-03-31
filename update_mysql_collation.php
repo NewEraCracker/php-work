@@ -1,4 +1,8 @@
 <?php
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
 
 /* Database details */
 $dbhost = '127.0.0.1';

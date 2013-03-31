@@ -1,6 +1,8 @@
 <?php
-// Author: NewEraCracker
-// License: Public Domain
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
 ?>
 SiMPLE PHP ENCODER BY NEWERACRACKER [v0.0.7]<br />
 <br />

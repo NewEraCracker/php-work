@@ -1,4 +1,9 @@
 <?php
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
+
 function MemcachePrintDetails($status)
 {
 	echo "<table border='1'>";

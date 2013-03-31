@@ -1,6 +1,8 @@
 <?php
-// Author: NewEraCracker
-// License: Public Domain
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
 
 function improved_explode($delimiter,$string,$escape=null)
 {

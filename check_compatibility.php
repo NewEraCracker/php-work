@@ -2,8 +2,8 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 3.0.1
-	@date    2013/05/04
+	@version 3.0.2
+	@date    2013/05/05
 	@license Public Domain
 
 	Inspired by all noobish hosting companies around the world
@@ -597,7 +597,7 @@ hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height:
 	{
 		if( function_exists('gd_info') )
 		{
-			$gdFound = 'The required PHP extension "GD Library" was found';
+			$gdFound = 'The required PHP extension "GD Library" was found, but ';
 
 			// We need GIF, JPEG and PNG support
 			$required_gd = array(
@@ -608,16 +608,16 @@ hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height:
 
 			foreach( $required_gd as $test )
 				if( !function_exists($test[0]) )
-					$this->warnings[__METHOD__][] = $gdFound.', but '.$test[1].' support is missing. Please add support for '.$test[1].' images in GD Library.';
+					$this->warnings[__METHOD__][] = $gdFound.$test[1].' support is missing. Please add support for '.$test[1].' images in GD Library.';
 
 			// We need GD 2 and freetype support
 			$gdInfo = @gd_info();
 
 			if( @$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"],'2.') )
-				$this->warnings[__METHOD__][] = $gdFound.', but GD Version is older than v2. Please fix this issue.';
+				$this->warnings[__METHOD__][] = $gdFound.'GD Version is older than v2. Please fix this issue.';
 
 			if( ! @$gdInfo['FreeType Support'] )
-				$this->warnings[__METHOD__][] = $gdFound.', but FreeType support is missing. Please add support for this.';
+				$this->warnings[__METHOD__][] = $gdFound.'FreeType support is missing. Please add support for this.';
 		}
 	}
 

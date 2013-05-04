@@ -290,18 +290,14 @@ hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height:
 			echo '<center><h2>The following issues have been found, please ask your host to fix them:</h2></center>'.'<br />'."\r\n";
 			foreach($this->warnings as $type => $warn)
 			{
+				echo '<table border="0" cellpadding="3" width="100%"><tr class="h"><th>Test: '.htmlspecialchars($type).'</th></tr>'."\r\n";
+
 				foreach($warn as $key => $message)
 				{
-					if( $key == 0 )
-					{
-						echo '<table border="0" cellpadding="3" width="100%"><tr class="h"><th>Test: '.htmlspecialchars($type).'</th></tr>'."\r\n";
-					}
 					echo '<tr><td>'.htmlspecialchars($message).'</td></tr>'."\r\n";
-					if( $key+1 == count($warn) )
-					{
-						echo '</table><br />'."\r\n";
-					}
 				}
+
+				echo '</table><br />'."\r\n";
 			}
 		}
 		else
@@ -332,11 +328,10 @@ hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height:
 			echo 'The following issues have been found, please ask your host to fix them:'."\r\n";
 			foreach($this->warnings as $type => $warn)
 			{
+				echo "\r\nTest: ".$type."\r\n";
+
 				foreach($warn as $key => $message)
 				{
-					if( $key == 0 )
-						echo "\r\nTest: ".$type."\r\n";
-
 					echo "\t".$message."\r\n";
 				}
 			}

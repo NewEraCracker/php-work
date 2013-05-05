@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 3.0.4
+	@version 3.0.5
 	@date    2013/05/05
 	@license Public Domain
 
@@ -608,28 +608,6 @@ h2 {font-size: 125%;}
 	}
 
 	/**
-	 * Check Ioncube Loader version
-	 */
-	private function test_ext_ioncube()
-	{
-		if( function_exists('ioncube_loader_version') )
-		{
-			if( !function_exists('ioncube_loader_iversion') )
-				$this->warnings[__METHOD__][] = 'You have a VERY old version of IonCube Loader which is known to cause problems.';
-
-			elseif(ioncube_loader_iversion() < 40400 && version_compare(PHP_VERSION, '5.4') >= 0)
-				$this->warnings[__METHOD__][] = 'You have an old version of IonCube Loader (earlier than 4.4.0) which is known to cause problems with PHP 5.4.';
-
-			elseif(ioncube_loader_iversion() < 40007)
-				$this->warnings[__METHOD__][] = 'You have an old version of IonCube Loader (earlier than 4.0.7) which is known to cause problems with PHP 5.2 and 5.3.';
-		}
-		else
-		{
-			$this->warnings[__METHOD__][] = 'You do not seem to have IonCube Loader installed.';
-		}
-	}
-
-	/**
 	 * Detect if mbstring configuration is problematic
 	 */
 	private function test_ext_mbstring()
@@ -705,8 +683,8 @@ h2 {font-size: 125%;}
 			$sessionFound = 'The required PHP extension "Session" was found, but ';
 
 			$session_path = @session_save_path();
-			if( strpos($session_path, ';') !== false ) // http://www.php.net/manual/en/function.session-save-path.php#50355
-				$session_path = substr($session_path, strpos($session_path, ';')+1);
+			if( FALSE !== ($tmp = strpos($session_path, ';')) ) // http://www.php.net/manual/en/function.session-save-path.php#50355
+				$session_path = substr($session_path, $tmp+1);
 			if( !empty($session_path) && !is_writable($session_path) ) // Make sure session path is writable
 				$this->warnings[__METHOD__][] = $sessionFound.'your session path '.$session_path.' is not writable. Please fix this issue.';
 
@@ -823,6 +801,75 @@ h2 {font-size: 125%;}
 
 			if($xmlBugTester->bad)
 				$this->warnings[__METHOD__][] = 'A bug has been detected in PHP+libxml2 which breaks XML input.';
+		}
+	}
+
+	/**
+	 * Check Ioncube Loader version
+	 */
+	private function test_loader_ioncube()
+	{
+		if( function_exists('ioncube_loader_version') )
+		{
+			if( !function_exists('ioncube_loader_iversion') )
+				$this->warnings[__METHOD__][] = 'You have a VERY old version of IonCube Loader which is known to cause problems.';
+
+			elseif(ioncube_loader_iversion() < 40400 && version_compare(PHP_VERSION, '5.4') >= 0)
+				$this->warnings[__METHOD__][] = 'You have an old version of IonCube Loader (earlier than 4.4.0) which is known to cause problems with PHP 5.4.';
+
+			elseif(ioncube_loader_iversion() < 40007)
+				$this->warnings[__METHOD__][] = 'You have an old version of IonCube Loader (earlier than 4.0.7) which is known to cause problems with PHP scripts.';
+		}
+		else
+		{
+			$this->warnings[__METHOD__][] = 'You do not seem to have IonCube Loader installed.';
+		}
+	}
+
+	/**
+	 * Check NuSphere PhpExpress version
+	 */
+	private function test_loader_phpexpress()
+	{
+		if( function_exists('phpexpress') )
+		{
+			// Fetch NuSphere PhpExpress information
+			ob_start();
+			@phpexpress();
+			$content = ob_get_clean();
+
+			// Attempt to find version offset
+			if( FALSE !== ($tmp = strpos($content, 'Version ')) )
+			{
+				$tmp += strlen('Version ');
+
+				// Build version string
+				$version = '';
+				for($i=$tmp; $i<($tmp+10); $i++)
+				{
+					if($content[$i] == '<')
+					{
+						// If we reach this, it means version is set
+						if( version_compare($version,'3.0.7') < 0 )
+							$this->warnings[__METHOD__][] = 'You have an old version of NuSphere PhpExpress (earlier than 3.0.7) which is known to cause problems with PHP scripts.';
+
+						break;
+					}
+					$version .= $content[$i];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check Zend Optimizer version
+	 */
+	private function test_loader_zend()
+	{
+		if( function_exists('zend_optimizer_version') )
+		{
+			if( version_compare(zend_optimizer_version(),'3.3.3') < 0 )
+				$this->warnings[__METHOD__][] = 'You have an old version of Zend Optimizer (earlier than 3.3.3) which is known to cause problems with PHP scripts.';
 		}
 	}
 }

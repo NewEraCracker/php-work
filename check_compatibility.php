@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 3.0.3
+	@version 3.0.4
 	@date    2013/05/05
 	@license Public Domain
 
@@ -425,21 +425,21 @@ h2 {font-size: 125%;}
 	 */
 	private function test_core_memory_limit()
 	{
-		if( $memLimit = improvedIniGet('memory_limit') )
+		if( $tmp = improvedIniGet('memory_limit') )
 		{
-			$memLimit = trim($memLimit);
-			$last = strtolower($memLimit[strlen($memLimit)-1]);
+			$tmp = trim($tmp);
+			$last = strtolower($tmp[strlen($tmp)-1]);
 			switch($last)
 			{
 				case 'g':
-					$memLimit *= 1024;
+					$tmp *= 1024;
 				case 'm':
-					$memLimit *= 1024;
+					$tmp *= 1024;
 				case 'k':
-					$memLimit *= 1024;
+					$tmp *= 1024;
 			}
 
-			if($memLimit < $this->rec_mem_limit_val)
+			if($tmp < $this->rec_mem_limit_val)
 				$this->warnings[__METHOD__][] = 'Memory Limit: '.$this->rec_mem_limit_set.' is required. Please increase this setting.';
 		}
 	}
@@ -538,24 +538,23 @@ h2 {font-size: 125%;}
 		if( extension_loaded('date') && class_exists('DateTimeZone') )
 		{
 			$error_message = 'Invalid or empty date.timezone setting detected.';
-			$status = improvedIniGet('date.timezone');
 
-			if( empty($status) )
-			{
-				// timezone is empty
-				$this->warnings[__METHOD__][] = $error_message;
-			}
-			else
+			if( $tmp = improvedIniGet('date.timezone') )
 			{
 				try
 				{
-					$tz = new DateTimeZone($status);
+					$tz = new DateTimeZone($tmp);
 				}
 				catch(Exception $e)
 				{
 					// timezone is invalid
 					$this->warnings[__METHOD__][] = $error_message;
 				}
+			}
+			else
+			{
+				// timezone is empty
+				$this->warnings[__METHOD__][] = $error_message;
 			}
 		}
 	}
@@ -792,7 +791,7 @@ h2 {font-size: 125%;}
 				{
 					if( $test[0] == 'suhosin.memory_limit' )
 					{
-						$last = strtolower($memLimit[strlen($memLimit)-1]);
+						$last = strtolower($tmp[strlen($tmp)-1]);
 						switch($last)
 						{
 							case 'g':

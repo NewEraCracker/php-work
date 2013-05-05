@@ -2,7 +2,7 @@
 /*
 	Helps checking compatibility with IP.Board and other scripts
 	@author  NewEraCracker
-	@version 3.0.2
+	@version 3.0.3
 	@date    2013/05/05
 	@license Public Domain
 
@@ -262,22 +262,14 @@ class Compatibility_Checker
 body {background-color: #ffffff; color: #000000;}
 body, td, th, h1, h2 {font-family: sans-serif;}
 pre {margin: 0px; font-family: monospace;}
-a:link {color: #000099; text-decoration: none;}
-a:hover {text-decoration: underline;}
 table {border-collapse: collapse;}
-.center {text-align: center;}
-.center table { margin-left: auto; margin-right: auto; text-align: left;}
-.center th { text-align: center; !important }
-td, th { border: 1px solid #000000; font-size: 75%; vertical-align: baseline;}
+td, th { border: 1px; font-size: 75%; vertical-align: baseline;}
 h1 {font-size: 150%;}
 h2 {font-size: 125%;}
-.p {text-align: left;}
-.e {background-color: #ccccff; font-weight: bold;}
-.h {background-color: #9999cc; font-weight: bold;}
-.v {background-color: #cccccc;}
-i {color: #666666;}
-img {float: right; border: 0px;}
-hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height: 1px;}
+.center {text-align: center;}
+.warntitle {text-align: center; margin: 2ex 0; border: 1px solid #660000; padding: 1ex 1em; background-color: #FFEEEE; color: #660000;}
+.warntext {text-align: left; margin: 2ex 0; border: 1px solid #660000; padding: 1ex 1em; background-color: #FDF5E6; color: #660000;}
+.success {text-align: center; margin: 2ex 0; border: 1px solid #006600; padding: 1ex 1em; background-color: #EEFFEE; color: #000000;}
 //--></style>
 </head>
 <body>';
@@ -287,14 +279,14 @@ hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height:
 		if( count($this->warnings) )
 		{
 			// Errors
-			echo '<center><h2>The following issues have been found, please ask your host to fix them:</h2></center>'.'<br />'."\r\n";
+			echo '<div class="center"><h2>The following issues have been found, please ask your host to fix them:</h2></div>'."\r\n";
 			foreach($this->warnings as $type => $warn)
 			{
-				echo '<table border="0" cellpadding="3" width="100%"><tr class="h"><th>Test: '.htmlspecialchars($type).'</th></tr>'."\r\n";
+				echo '<table border="0" cellpadding="3" width="100%" class="warntitle"><tr><th>Test: '.htmlspecialchars($type).'</th></tr>'."\r\n";
 
 				foreach($warn as $key => $message)
 				{
-					echo '<tr><td>'.htmlspecialchars($message).'</td></tr>'."\r\n";
+					echo '<tr><td class="warntext">'.htmlspecialchars($message).'</td></tr>'."\r\n";
 				}
 
 				echo '</table><br />'."\r\n";
@@ -303,7 +295,7 @@ hr {width: 600px; align: center; background-color: #cccccc; border: 0px; height:
 		else
 		{
 			// Balls to you!
-			echo '<center><h2>Congratulations</h2><br />No problems have been detected.</center>';
+			echo '<div class="success"><h2>Congratulations</h2><br />No problems have been detected.<br /><br /></div>';
 		}
 
 		// Footer

@@ -282,7 +282,7 @@ h2 {font-size: 125%;}
 			echo '<div class="center"><h2>The following issues have been found, please ask your host to fix them:</h2></div>'."\r\n";
 			foreach($this->warnings as $type => $warn)
 			{
-				echo '<table border="0" cellpadding="3" width="100%" class="warntitle"><tr><th>Test: '.htmlspecialchars($type).'</th></tr>'."\r\n";
+				echo '<table border="0" cellpadding="3" width="100%"><tr><th class="warntitle">Test: '.htmlspecialchars($type).'</th></tr>'."\r\n";
 
 				foreach($warn as $key => $message)
 				{

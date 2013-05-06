@@ -1,17 +1,17 @@
 <?php
 /*
-	Helps checking compatibility with IP.Board and other scripts
-	@author  NewEraCracker
-	@version 3.0.5
-	@date    2013/05/05
-	@license Public Domain
+  Helps checking compatibility with IP.Board and other scripts
+  @author  NewEraCracker
+  @version 3.0.6
+  @date    2013/05/06
+  @license Public Domain
 
-	Inspired by all noobish hosting companies around the world
+  Inspired by all noobish hosting companies around the world
 
-	Greetz to:
-	 - ForumScriptz Team
-	 - Matt Mecham
-	 - Xenforo Developers
+  Greetz to:
+   - ForumScriptz Team
+   - Matt Mecham
+   - Xenforo Developers
 */
 
 /* -------------
@@ -49,7 +49,7 @@ function cleanup_crlf($text)
  */
 function intAbs($number)
 {
-	return (int)str_replace('-','',(string)$number);
+	return (int)str_replace('-', '', (string)$number);
 }
 
 /**
@@ -57,10 +57,10 @@ function intAbs($number)
  */
 function improvedIniGet($varname)
 {
-	if( function_exists('ini_get') )
+	if(function_exists('ini_get'))
 		return @ini_get($varname);
 
-	if( function_exists('get_cfg_var') )
+	if(function_exists('get_cfg_var'))
 		return @get_cfg_var($varname);
 }
 
@@ -74,10 +74,10 @@ function improvedIntVal($value)
 	$found = false;
 
 	// Build
-	for( $i=0; $i<strlen($value); $i++ )
+	for($i = 0; $i < strlen($value); $i++)
 	{
 		// Found a number ?
-		if( is_numeric($value[$i]) )
+		if(is_numeric($value[$i]))
 		{
 			$found = true;
 			$new .= $value[$i];
@@ -99,9 +99,9 @@ function improvedIntVal($value)
  */
 function mySqlVersionStringToInt($version)
 {
-	$version = explode('.',$version);
-	$version = array_map('improvedIntVal',$version);
-	$version = $version[0]*10000 + $version[1]*100 + $version[2];
+	$version = explode('.', $version);
+	$version = array_map('improvedIntVal', $version);
+	$version = $version[0] * 10000 + $version[1] * 100 + $version[2];
 	return $version;
 }
 
@@ -113,14 +113,14 @@ function mySqlVersionIntToString($version)
 	$version_string = '';
 	$version_remain = (int)($version);
 
-	foreach( array(10000,100,1) as $value)
+	foreach(array(10000, 100, 1) as $value)
 	{
-		$version_bit     = (int)($version_remain/$value);
-		$version_remain  = (int)($version_remain-($version_bit*$value));
+		$version_bit     = (int)($version_remain / $value);
+		$version_remain  = (int)($version_remain - ($version_bit * $value));
 		$version_string .= $version_bit.'.';
 	}
 
-	return rtrim($version_string,'.');
+	return rtrim($version_string, '.');
 }
 
 /* ---------------
@@ -135,23 +135,23 @@ class RefCallBugTester
 {
 	public $bad = true;
 
-	public function __call( $name, $args )
+	public function __call($name, $args)
 	{
-		$old = error_reporting( E_ALL & ~E_WARNING );
-		call_user_func_array( array( $this, 'checkForBrokenRef' ), $args );
-		error_reporting( $old );
+		$old = error_reporting(E_ALL & ~E_WARNING);
+		call_user_func_array(array($this, 'checkForBrokenRef'), $args);
+		error_reporting($old);
 	}
 
-	public function checkForBrokenRef( &$var )
+	public function checkForBrokenRef(&$var)
 	{
-		if( $var )
+		if($var)
 			$this->bad = false;
 	}
 
 	public function execute()
 	{
 		$var = true;
-		call_user_func_array( array( $this, 'foo' ), array( &$var ) );
+		call_user_func_array(array($this, 'foo'), array(&$var));
 	}
 }
 
@@ -168,15 +168,15 @@ class XmlBugTester
 	public function __construct()
 	{
 		$charData = '<b>c</b>';
-		$xml = '<a>' . htmlspecialchars( $charData ) . '</a>';
+		$xml = '<a>'.htmlspecialchars($charData).'</a>';
 
 		$parser = xml_parser_create();
-		xml_set_character_data_handler( $parser, array( $this, 'chardata' ) );
-		$parsedOk = xml_parse( $parser, $xml, true );
-		$this->bad = ( !$parsedOk || ($this->parsedData != $charData) );
+		xml_set_character_data_handler($parser, array($this, 'chardata'));
+		$parsedOk = xml_parse($parser, $xml, true);
+		$this->bad = (!$parsedOk || ($this->parsedData != $charData));
 	}
 
-	public function chardata( $parser, $data )
+	public function chardata($parser, $data)
 	{
 		$this->parsedData .= $data;
 	}
@@ -198,13 +198,13 @@ class Compatibility_Checker
 	public function __construct()
 	{
 		// Recommended memory limit
-		$this->rec_mem_limit_val = (128*1024*1024);
+		$this->rec_mem_limit_val = (128 * 1024 * 1024);
 		$this->rec_mem_limit_set = '128M';
 
 		// Build disabled functions array
 		$tmp = array();
 
-		foreach( array('disable_functions', 'suhosin.executor.eval.blacklist', 'suhosin.executor.func.blacklist') as $var )
+		foreach(array('disable_functions', 'suhosin.executor.eval.blacklist', 'suhosin.executor.func.blacklist') as $var)
 			$tmp = array_merge($tmp, array_map('trim', explode(',', improvedIniGet($var))));
 
 		$this->disabled_functions = array_unique($tmp);
@@ -218,7 +218,7 @@ class Compatibility_Checker
 		// Call each test to fill warnings array
 		foreach(get_class_methods($this) as $method)
 		{
-			if( strpos($method,'test_') === 0 )
+			if(strpos($method, 'test_') === 0)
 				call_user_func(array($this, $method));
 		}
 
@@ -237,7 +237,7 @@ class Compatibility_Checker
 	 */
 	public function output()
 	{
-		if( isset($_SERVER['HTTP_USER_AGENT']) )
+		if(isset($_SERVER['HTTP_USER_AGENT']))
 			$this->output_web();
 		else
 			$this->output_cli();
@@ -276,7 +276,7 @@ h2 {font-size: 125%;}
 		ob_end_flush();
 
 		// Body
-		if( count($this->warnings) )
+		if(count($this->warnings))
 		{
 			// Errors
 			echo '<div class="center"><h2>The following issues have been found, please ask your host to fix them:</h2></div>'."\r\n";
@@ -307,14 +307,14 @@ h2 {font-size: 125%;}
 	 */
 	private function output_cli()
 	{
-		if( isset($_SERVER['REMOTE_ADDR']) )
+		if(isset($_SERVER['REMOTE_ADDR']))
 		{
 			// We are not in cli it seems, lets send headers
 			header('Cache-Control: no-cache');
 			header('Content-Type: text/plain');
 		}
 
-		if( count($this->warnings) )
+		if(count($this->warnings))
 		{
 			// Errors
 			echo 'The following issues have been found, please ask your host to fix them:'."\r\n";
@@ -366,28 +366,28 @@ h2 {font-size: 125%;}
 	private function test_core_extensions()
 	{
 		$required_extensions = array(
-			array( 'ctype', 'Ctype' ),
-			array( 'curl', 'cURL' ),
-			array( 'dom', 'Document Object Model' ),
-			array( 'iconv', 'Iconv' ),
-			array( 'gd', 'GD Library' ),
-			array( 'json', 'JSON' ),
-			array( 'mbstring', 'Multibyte String' ),
-			array( 'mysql', 'MySQL'  ),
-			array( 'mysqli', 'MySQLi' ),
-			array( 'openssl', 'OpenSSL'  ),
-			array( 'pcre', 'Perl-Compatible Regular Expressions' ),
-			array( 'reflection', 'Reflection Class' ),
-			array( 'session', 'Session' ),
-			array( 'spl', 'SPL' ),
-			array( 'xml', 'XML Parser' ),
-			array( 'zip', 'Zip' ),
-			array( 'zlib', 'Zlib' ),
+			array('ctype', 'Ctype'),
+			array('curl', 'cURL'),
+			array('dom', 'Document Object Model'),
+			array('iconv', 'Iconv'),
+			array('gd', 'GD Library'),
+			array('json', 'JSON'),
+			array('mbstring', 'Multibyte String'),
+			array('mysql', 'MySQL'),
+			array('mysqli', 'MySQLi'),
+			array('openssl', 'OpenSSL'),
+			array('pcre', 'Perl-Compatible Regular Expressions'),
+			array('reflection', 'Reflection Class'),
+			array('session', 'Session'),
+			array('spl', 'SPL'),
+			array('xml', 'XML Parser'),
+			array('zip', 'Zip'),
+			array('zlib', 'Zlib'),
 		);
 
-		foreach( $required_extensions as $test )
+		foreach($required_extensions as $test)
 		{
-			if( !extension_loaded($test[0]) )
+			if(!extension_loaded($test[0]))
 				$this->warnings[__METHOD__][] = 'The required PHP extension "'.$test[1].'" could not be found. You need to install/enable this extension.';
 		}
 	}
@@ -397,16 +397,16 @@ h2 {font-size: 125%;}
 	 */
 	private function test_core_functions()
 	{
-		// Function available since PHP 4
+		// Functions available since PHP 4
 		$functions_required = array('php_uname', 'base64_decode', 'fpassthru', 'get_cfg_var', 'ini_set', 'ini_get', 'parse_ini_file');
 
 		// Function available since PHP 5.3
-		if( version_compare(PHP_VERSION, '5.3') >= 0 )
+		if(version_compare(PHP_VERSION, '5.3') >= 0)
 			$functions_required = array_merge($functions_required, array('parse_ini_string'));
 
-		foreach( $functions_required as $test )
+		foreach($functions_required as $test)
 		{
-			if( !function_exists($test) || in_array($test, $this->disabled_functions) )
+			if(!function_exists($test) || in_array($test, $this->disabled_functions))
 				$this->warnings[__METHOD__][] = 'Function '.$test.' is required to be enabled in PHP.';
 		}
 	}
@@ -416,7 +416,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_core_max_input_vars()
 	{
-		if( version_compare(PHP_VERSION, '5.3.9') >= 0 && (improvedIniGet('max_input_vars') < 4096) )
+		if(version_compare(PHP_VERSION, '5.3.9') >= 0 && (improvedIniGet('max_input_vars') < 4096))
 			$this->warnings[__METHOD__][] = 'Problematic max_input_vars setting detected, please set it to 4096 or higher.';
 	}
 
@@ -425,7 +425,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_core_memory_limit()
 	{
-		if( $tmp = improvedIniGet('memory_limit') )
+		if($tmp = improvedIniGet('memory_limit'))
 		{
 			$tmp = trim($tmp);
 			$last = strtolower($tmp[strlen($tmp)-1]);
@@ -450,15 +450,15 @@ h2 {font-size: 125%;}
 	private function test_core_settings()
 	{
 		$php_checks = array(
-			array( in_array('eval',$this->disabled_functions), 'Language construct eval is required to be enabled in PHP.'),
-			array( improvedIniGet('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'Setting magic_quotes_gpc has been found enabled in your php.ini. Disable it for better functionality.'),
-			array( improvedIniGet('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
-			array( improvedIniGet('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
-			array( improvedIniGet('zlib.output_compression' ), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
-			array( improvedIniGet('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this value to Off.'),
+			array(in_array('eval',$this->disabled_functions), 'Language construct eval is required to be enabled in PHP.'),
+			array(improvedIniGet('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'Setting magic_quotes_gpc has been found enabled in your php.ini. Disable it for better functionality.'),
+			array(improvedIniGet('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
+			array(improvedIniGet('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
+			array(improvedIniGet('zlib.output_compression'), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
+			array(improvedIniGet('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this value to Off.'),
 		);
 
-		foreach( $php_checks as $test )
+		foreach($php_checks as $test)
 		{
 			if($test[0])
 				$this->warnings[__METHOD__][] = $test[1];
@@ -471,7 +471,7 @@ h2 {font-size: 125%;}
 	private function test_core_uploads()
 	{
 		$upload_dir = improvedIniGet('upload_tmp_dir') ? improvedIniGet('upload_tmp_dir') : @sys_get_temp_dir();
-		if( !empty($upload_dir) && !is_writable($upload_dir) ) // Make sure upload dir is writable
+		if(!empty($upload_dir) && !is_writable($upload_dir)) // Make sure upload dir is writable
 			$this->warnings[__METHOD__][] = 'Your upload temporary directory '.$upload_dir.' is not writable. Please fix this issue.';
 	}
 
@@ -498,7 +498,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_curl()
 	{
-		if( extension_loaded('curl') )
+		if(extension_loaded('curl'))
 		{
 			$curlFound = 'The required PHP extension "cURL" was found, but ';
 
@@ -509,20 +509,20 @@ h2 {font-size: 125%;}
 				'curl_multi_info_read', 'curl_multi_init', 'curl_multi_remove_handle', 'curl_multi_select',
 				'curl_setopt_array', 'curl_setopt', 'curl_version',
 				);
-			foreach( $curlFuctions as $test )
+			foreach($curlFuctions as $test)
 				if(!function_exists($test) || in_array($test, $this->disabled_functions))
 					$this->warnings[__METHOD__][] = $curlFound.'function '.$test.' is disabled. Please enable it.';
 
 			// We need SSL and ZLIB support
-			if( $curlVersion = @curl_version() )
+			if($curlVersion = @curl_version())
 			{
-				$curlBitFields = array( 'CURL_VERSION_SSL', 'CURL_VERSION_LIBZ' );
-				$curlBitFriendly = array( 'SSL', 'ZLIB' );
+				$curlBitFields = array('CURL_VERSION_SSL', 'CURL_VERSION_LIBZ');
+				$curlBitFriendly = array('SSL', 'ZLIB');
 
 				foreach($curlBitFields as $arr_key => $feature)
 				{
 					$test = $curlBitFriendly[$arr_key];
-					if( !($curlVersion['features'] && constant($feature)) )
+					if(!($curlVersion['features'] && constant($feature)))
 						$this->warnings[__METHOD__][] = $curlFound.$test.' support is missing. Please add support for '.$test.' in cURL.';
 				}
 			}
@@ -535,11 +535,11 @@ h2 {font-size: 125%;}
 	private function test_ext_date()
 	{
 		// check if date is loaded and DateTimeZone class exists
-		if( extension_loaded('date') && class_exists('DateTimeZone') )
+		if(extension_loaded('date') && class_exists('DateTimeZone'))
 		{
 			$error_message = 'Invalid or empty date.timezone setting detected.';
 
-			if( $tmp = improvedIniGet('date.timezone') )
+			if($tmp = improvedIniGet('date.timezone'))
 			{
 				try
 				{
@@ -564,7 +564,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_eaccelerator()
 	{
-		if( function_exists('eaccelerator_info') )
+		if(function_exists('eaccelerator_info'))
 		{
 			$ea_info = eaccelerator_info();
 
@@ -581,28 +581,28 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_gd()
 	{
-		if( function_exists('gd_info') )
+		if(function_exists('gd_info'))
 		{
 			$gdFound = 'The required PHP extension "GD Library" was found, but ';
 
 			// We need GIF, JPEG and PNG support
 			$required_gd = array(
-				array( 'imagecreatefromgif', 'GIF' ),
-				array( 'imagecreatefromjpeg', 'JPEG' ),
-				array( 'imagecreatefrompng', 'PNG' ),
+				array('imagecreatefromgif', 'GIF'),
+				array('imagecreatefromjpeg', 'JPEG'),
+				array('imagecreatefrompng', 'PNG'),
 			);
 
-			foreach( $required_gd as $test )
-				if( !function_exists($test[0]) )
+			foreach($required_gd as $test)
+				if(!function_exists($test[0]))
 					$this->warnings[__METHOD__][] = $gdFound.$test[1].' support is missing. Please add support for '.$test[1].' images in GD Library.';
 
 			// We need GD 2 and freetype support
 			$gdInfo = @gd_info();
 
-			if( @$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"],'2.') )
+			if(@$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"], '2.'))
 				$this->warnings[__METHOD__][] = $gdFound.'GD Version is older than v2. Please fix this issue.';
 
-			if( ! @$gdInfo['FreeType Support'] )
+			if(!@$gdInfo['FreeType Support'])
 				$this->warnings[__METHOD__][] = $gdFound.'FreeType support is missing. Please add support for this.';
 		}
 	}
@@ -612,7 +612,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_mbstring()
 	{
-		if( extension_loaded('mbstring') && improvedIniGet('mbstring.func_overload') )
+		if(extension_loaded('mbstring') && improvedIniGet('mbstring.func_overload'))
 			$this->warnings[__METHOD__][] = 'Extension Multibyte String may break data when mbstring.func_overload setting is enabled. Please disable this setting.';
 	}
 
@@ -623,14 +623,14 @@ h2 {font-size: 125%;}
 	{
 		global $CONFIG;
 
-		if( $CONFIG['mysql_enabled'] )
+		if($CONFIG['mysql_enabled'])
 		{
 			// Just to be sure
 			$mysql_port = (int)$CONFIG['mysql_port'];
 
-			if( function_exists('mysqli_connect') )
+			if(function_exists('mysqli_connect'))
 			{
-				$mysqli = @mysqli_connect($CONFIG['mysql_host'],$CONFIG['mysql_user'],$CONFIG['mysql_pass'],'',$mysql_port);
+				$mysqli = @mysqli_connect($CONFIG['mysql_host'], $CONFIG['mysql_user'], $CONFIG['mysql_pass'], '', $mysql_port);
 
 				if(!$mysqli)
 				{
@@ -638,15 +638,15 @@ h2 {font-size: 125%;}
 				}
 				else
 				{
-					$client_version = mySqlVersionStringToInt( mysqli_get_client_info() );
-					$server_version = mySqlVersionStringToInt( mysqli_get_server_info($mysqli) );
+					$client_version = mySqlVersionStringToInt(mysqli_get_client_info());
+					$server_version = mySqlVersionStringToInt(mysqli_get_server_info($mysqli));
 					mysqli_close($mysqli);
 				}
 			}
-			elseif( function_exists('mysql_connect') )
+			elseif(function_exists('mysql_connect'))
 			{
 				$mysql_host = $CONFIG['mysql_host'].':'.$mysql_port;
-				$mysql = @mysql_connect($mysql_host,$CONFIG['mysql_user'],$CONFIG['mysql_pass']);
+				$mysql = @mysql_connect($mysql_host, $CONFIG['mysql_user'], $CONFIG['mysql_pass']);
 
 				if(!$mysql)
 				{
@@ -654,18 +654,18 @@ h2 {font-size: 125%;}
 				}
 				else
 				{
-					$client_version = mySqlVersionStringToInt( mysql_get_client_info() );
-					$server_version = mySqlVersionStringToInt( mysql_get_server_info($mysql) );
+					$client_version = mySqlVersionStringToInt(mysql_get_client_info());
+					$server_version = mySqlVersionStringToInt(mysql_get_server_info($mysql));
 					mysql_close($mysql);
 				}
 			}
 
-			if( isset($server_version) && isset($client_version) )
+			if(isset($server_version) && isset($client_version))
 			{
 				if($server_version < 50100)
 					$this->warnings[__METHOD__][] = 'You are running MySQL '.mySqlVersionIntToString($server_version).'. We recommend upgrading to at least MySQL 5.1.';
 
-				if( intAbs($server_version-$client_version) >= 1000 )
+				if(intAbs($server_version - $client_version) >= 1000)
 					$this->warnings[__METHOD__][] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).').';
 			}
 		}
@@ -678,28 +678,28 @@ h2 {font-size: 125%;}
 	{
 		global $CONFIG;
 
-		if( extension_loaded('session') )
+		if(extension_loaded('session'))
 		{
 			$sessionFound = 'The required PHP extension "Session" was found, but ';
 
 			$session_path = @session_save_path();
-			if( FALSE !== ($tmp = strpos($session_path, ';')) ) // http://www.php.net/manual/en/function.session-save-path.php#50355
+			if(FALSE !== ($tmp = strpos($session_path, ';'))) // http://www.php.net/manual/en/function.session-save-path.php#50355
 				$session_path = substr($session_path, $tmp+1);
-			if( !empty($session_path) && !is_writable($session_path) ) // Make sure session path is writable
+			if(!empty($session_path) && !is_writable($session_path)) // Make sure session path is writable
 				$this->warnings[__METHOD__][] = $sessionFound.'your session path '.$session_path.' is not writable. Please fix this issue.';
 
-			if( improvedIniGet('session.use_trans_sid') )
+			if(improvedIniGet('session.use_trans_sid'))
 				$this->warnings[__METHOD__][] = $sessionFound.'session.use_trans_sid is enabled. Please disable this setting for security reasons.';
 
-			if( ! improvedIniGet('session.use_only_cookies') )
+			if(!improvedIniGet('session.use_only_cookies'))
 				$this->warnings[__METHOD__][] = $sessionFound.'session.use_only_cookies is disabled. Please enable this setting for security reasons.';
 
-			if( $CONFIG['session_enable_extended_check'] )
+			if($CONFIG['session_enable_extended_check'])
 			{
-				if( improvedIniGet('session.hash_bits_per_character') < 5 )
+				if(improvedIniGet('session.hash_bits_per_character') < 5)
 					$this->warnings[__METHOD__][] = $sessionFound.'session.hash_bits_per_character is set to a low value. Please set it to 5 for security reasons.';
 
-				if( ! improvedIniGet('session.hash_function') )
+				if(!improvedIniGet('session.hash_function'))
 					$this->warnings[__METHOD__][] = $sessionFound.'session.hash_function is set to a weak value. Please set it to 1 for security reasons.';
 			}
 		}
@@ -710,7 +710,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_suhosin()
 	{
-		if( extension_loaded('suhosin') )
+		if(extension_loaded('suhosin'))
 		{
 			// Value has to be false or zero to pass tests
 			$test_false = array(
@@ -723,51 +723,51 @@ h2 {font-size: 125%;}
 
 			// Value has to be the same or higher to pass tests
 			$test_values = array(
-				array( 'suhosin.cookie.max_name_length', 64),
-				array( 'suhosin.cookie.max_totalname_length', 256),
-				array( 'suhosin.cookie.max_value_length', 10000),
-				array( 'suhosin.get.max_name_length', 512 ),
-				array( 'suhosin.get.max_totalname_length', 512 ),
-				array( 'suhosin.get.max_value_length', 2048 ),
-				array( 'suhosin.post.max_array_index_length', 256 ),
-				array( 'suhosin.post.max_name_length', 512 ),
-				array( 'suhosin.post.max_totalname_length', 8192 ),
-				array( 'suhosin.post.max_vars', 4096 ),
-				array( 'suhosin.post.max_value_length', 1000000 ),
-				array( 'suhosin.request.max_array_index_length', 256 ),
-				array( 'suhosin.request.max_totalname_length', 8192 ),
-				array( 'suhosin.request.max_vars', 4096 ),
-				array( 'suhosin.request.max_value_length', 1000000 ),
-				array( 'suhosin.request.max_varname_length', 512 )
+				array('suhosin.cookie.max_name_length', 64),
+				array('suhosin.cookie.max_totalname_length', 256),
+				array('suhosin.cookie.max_value_length', 10000),
+				array('suhosin.get.max_name_length', 512),
+				array('suhosin.get.max_totalname_length', 512),
+				array('suhosin.get.max_value_length', 2048),
+				array('suhosin.post.max_array_index_length', 256),
+				array('suhosin.post.max_name_length', 512),
+				array('suhosin.post.max_totalname_length', 8192),
+				array('suhosin.post.max_vars', 4096),
+				array('suhosin.post.max_value_length', 1000000),
+				array('suhosin.request.max_array_index_length', 256),
+				array('suhosin.request.max_totalname_length', 8192),
+				array('suhosin.request.max_vars', 4096),
+				array('suhosin.request.max_value_length', 1000000),
+				array('suhosin.request.max_varname_length', 512)
 			);
 
 			// Value has to be zero (protection disabled), equal or higher than x to pass
 			$test_zero_or_higher_than_value = array(
-				array( 'suhosin.executor.max_depth', 10000),
-				array( 'suhosin.executor.include.max_traversal', 6),
-				array( 'suhosin.memory_limit', $this->rec_mem_limit_val)
+				array('suhosin.executor.max_depth', 10000),
+				array('suhosin.executor.include.max_traversal', 6),
+				array('suhosin.memory_limit', $this->rec_mem_limit_val)
 			);
 
 			foreach($test_false as $test)
 			{
-				if( improvedIniGet($test) )
+				if(improvedIniGet($test))
 					$this->warnings[__METHOD__][] = $test.' is required to be set to '.(($test == 'suhosin.mail.protect') ? '0 (Zero)' : 'Off').'in php.ini. Your server does not meet this requirement.';
 			}
 
 			foreach($test_values as $test)
 			{
-				if( isset($test[0]) && isset($test[1]) )
+				if(isset($test[0]) && isset($test[1]))
 				{
-					if( improvedIniGet($test[0]) < $test[1] )
+					if(improvedIniGet($test[0]) < $test[1])
 						$this->warnings[__METHOD__][] = 'It is required that '.$test[0].' is set to '.$test[1].' or higher.';
 				}
 			}
 
 			foreach($test_zero_or_higher_than_value as $test)
 			{
-				if( $tmp = improvedIniGet($test[0]) )
+				if($tmp = improvedIniGet($test[0]))
 				{
-					if( $test[0] == 'suhosin.memory_limit' )
+					if($test[0] == 'suhosin.memory_limit')
 					{
 						$last = strtolower($tmp[strlen($tmp)-1]);
 						switch($last)
@@ -781,7 +781,7 @@ h2 {font-size: 125%;}
 						}
 					}
 
-					if( $tmp < $test[1] )
+					if($tmp < $test[1])
 						$this->warnings[__METHOD__][] = 'It is required that '.$test[0].' is set to either 0 (Zero), '.(($test[0] == 'suhosin.memory_limit') ? $this->rec_mem_limit_set : $test[1]).' or higher.';
 				}
 			}
@@ -795,7 +795,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_xml()
 	{
-		if( extension_loaded('xml') )
+		if(extension_loaded('xml'))
 		{
 			$xmlBugTester = new XmlBugTester();
 
@@ -809,9 +809,9 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_ioncube()
 	{
-		if( function_exists('ioncube_loader_version') )
+		if(function_exists('ioncube_loader_version'))
 		{
-			if( !function_exists('ioncube_loader_iversion') )
+			if(!function_exists('ioncube_loader_iversion'))
 				$this->warnings[__METHOD__][] = 'You have a VERY old version of IonCube Loader which is known to cause problems.';
 
 			elseif(ioncube_loader_iversion() < 40400 && version_compare(PHP_VERSION, '5.4') >= 0)
@@ -831,7 +831,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_phpexpress()
 	{
-		if( function_exists('phpexpress') )
+		if(function_exists('phpexpress'))
 		{
 			// Fetch NuSphere PhpExpress information
 			ob_start();
@@ -839,18 +839,18 @@ h2 {font-size: 125%;}
 			$content = ob_get_clean();
 
 			// Attempt to find version offset
-			if( FALSE !== ($tmp = strpos($content, 'Version ')) )
+			if(FALSE !== ($tmp = strpos($content, 'Version ')))
 			{
 				$tmp += strlen('Version ');
 
 				// Build version string
 				$version = '';
-				for($i=$tmp; $i<($tmp+10); $i++)
+				for($i = $tmp; $i < ($tmp+10); $i++)
 				{
 					if($content[$i] == '<')
 					{
 						// If we reach this, it means version is set
-						if( version_compare($version,'3.0.7') < 0 )
+						if(version_compare($version, '3.0.7') < 0)
 							$this->warnings[__METHOD__][] = 'You have an old version of NuSphere PhpExpress (earlier than 3.0.7) which is known to cause problems with PHP scripts.';
 
 						break;
@@ -866,9 +866,9 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_zend()
 	{
-		if( function_exists('zend_optimizer_version') )
+		if(function_exists('zend_optimizer_version'))
 		{
-			if( version_compare(zend_optimizer_version(),'3.3.3') < 0 )
+			if(version_compare(zend_optimizer_version(), '3.3.3') < 0)
 				$this->warnings[__METHOD__][] = 'You have an old version of Zend Optimizer (earlier than 3.3.3) which is known to cause problems with PHP scripts.';
 		}
 	}

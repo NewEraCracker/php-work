@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.0.6
-  @date    2013/05/06
+  @version 3.0.7
+  @date    2013/05/08
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -809,7 +809,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_ioncube()
 	{
-		if(function_exists('ioncube_loader_version'))
+		if(extension_loaded('ionCube Loader') && function_exists('ioncube_loader_version'))
 		{
 			if(!function_exists('ioncube_loader_iversion'))
 				$this->warnings[__METHOD__][] = 'You have a VERY old version of IonCube Loader which is known to cause problems.';
@@ -831,7 +831,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_phpexpress()
 	{
-		if(function_exists('phpexpress'))
+		if(extension_loaded('NuSphere PhpExpress') && function_exists('phpexpress'))
 		{
 			// Fetch NuSphere PhpExpress information
 			ob_start();
@@ -866,7 +866,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_zend()
 	{
-		if(function_exists('zend_optimizer_version'))
+		if(extension_loaded('Zend Optimizer') && function_exists('zend_optimizer_version'))
 		{
 			if(version_compare(zend_optimizer_version(), '3.3.3') < 0)
 				$this->warnings[__METHOD__][] = 'You have an old version of Zend Optimizer (earlier than 3.3.3) which is known to cause problems with PHP scripts.';

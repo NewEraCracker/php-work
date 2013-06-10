@@ -566,6 +566,7 @@ h2 {font-size: 125%;}
 	{
 		if(function_exists('eaccelerator_info'))
 		{
+			/*
 			$ea_info = eaccelerator_info();
 
 			if(version_compare($ea_info['version'], '0.9.9') <= 0)
@@ -573,6 +574,8 @@ h2 {font-size: 125%;}
 				// Only 1.0-dev are known to work
 				$this->warnings[__METHOD__][] = 'You have an old version of eAccelerator (earlier than 1.0) which is known to cause problems.';
 			}
+			*/
+			$this->warnings[__METHOD__][] = 'You appear to be using the eAccelerator. Be aware that it has limitations which cause problems. Switching to another PHP optimizer such as Zend OPcache is recommended.';
 		}
 	}
 

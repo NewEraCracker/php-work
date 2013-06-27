@@ -398,7 +398,7 @@ h2 {font-size: 125%;}
 	private function test_core_functions()
 	{
 		// Functions available since PHP 4
-		$functions_required = array('php_uname', 'base64_decode', 'fpassthru', 'get_cfg_var', 'ini_set', 'ini_get', 'parse_ini_file');
+		$functions_required = array('base64_decode', 'crypt', 'fpassthru', 'get_cfg_var', 'ini_get', 'ini_set', 'parse_ini_file', 'php_uname');
 
 		// Function available since PHP 5.3
 		if(version_compare(PHP_VERSION, '5.3') >= 0)
@@ -491,6 +491,21 @@ h2 {font-size: 125%;}
 		// If 5.3, check for lower than 5.3.5
 		elseif(version_compare(PHP_VERSION, '5.3') >= 0 && version_compare(PHP_VERSION, '5.3.5') < 0)
 			$this->warnings[__METHOD__][] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
+	}
+
+	/**
+	 * Check PHP's crypt
+	 */
+	private function test_crypt()
+	{
+		if(function_exists('crypt'))
+		{
+			$hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
+			$test = crypt('password', $hash);
+
+			if($test !== $hash)
+				$this->warnings[__METHOD__][] = 'A problem has been found in crypt()\'s Blowfish functionality. Please upgrade to PHP 5.3.7 or higher.';
+		}
 	}
 
 	/**

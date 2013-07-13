@@ -417,7 +417,7 @@ h2 {font-size: 125%;}
 	private function test_core_max_input_vars()
 	{
 		$tmp = improvedIniGet('max_input_vars');
-		if($tmp !== FALSE && $tmp < 4096) // This setting was added in PHP 5.3.9 but some distros backported it to older PHP versions
+		if(strlen($tmp) > 0 && $tmp < 4096) // This setting was added in PHP 5.3.9 but some distros backported it to older PHP versions
 			$this->warnings[__METHOD__][] = 'Problematic max_input_vars setting detected, please set it to 4096 or higher.';
 	}
 

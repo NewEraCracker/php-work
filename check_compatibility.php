@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.0.7
-  @date    2013/05/08
+  @version 3.0.8
+  @date    2013/07/13
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world

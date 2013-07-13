@@ -2,7 +2,7 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.0.8
+  @version 3.0.9
   @date    2013/07/13
   @license Public Domain
 

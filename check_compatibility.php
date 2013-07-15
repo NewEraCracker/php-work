@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.0.9
-  @date    2013/07/13
+  @version 3.1.0
+  @date    2013/07/15
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -219,7 +219,7 @@ class Compatibility_Checker
 		foreach(get_class_methods($this) as $method)
 		{
 			if(strpos($method, 'test_') === 0)
-				call_user_func(array($this, $method));
+				$this->{$method}();
 		}
 
 		// Dirty hack to remove prefix from array keys

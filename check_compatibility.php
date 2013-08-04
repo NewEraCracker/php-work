@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.1.0
-  @date    2013/07/15
+  @version 3.1.1
+  @date    2013/08/04
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -371,12 +371,16 @@ h2 {font-size: 125%;}
 			array('dom', 'Document Object Model'),
 			array('iconv', 'Iconv'),
 			array('gd', 'GD Library'),
+			array('hash', 'HASH'),
 			array('json', 'JSON'),
 			array('mbstring', 'Multibyte String'),
+			array('mcrypt', 'Mcrypt'),
 			array('mysql', 'MySQL'),
 			array('mysqli', 'MySQLi'),
 			array('openssl', 'OpenSSL'),
 			array('pcre', 'Perl-Compatible Regular Expressions'),
+			array('pdo', 'PDO'),
+			array('pdo_mysql', 'PDO MySQL'),
 			array('reflection', 'Reflection Class'),
 			array('session', 'Session'),
 			array('spl', 'SPL'),
@@ -452,11 +456,11 @@ h2 {font-size: 125%;}
 	{
 		$php_checks = array(
 			array(in_array('eval',$this->disabled_functions), 'Language construct eval is required to be enabled in PHP.'),
-			array(improvedIniGet('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'Setting magic_quotes_gpc has been found enabled in your php.ini. Disable it for better functionality.'),
+			array(improvedIniGet('magic_quotes_gpc') || @get_magic_quotes_gpc(), 'magic_quotes_gpc are enabled in your php.ini. Disable this for better functionality.'),
 			array(improvedIniGet('safe_mode'), 'PHP must not be running in safe_mode. Disable the PHP safe_mode setting.'),
-			array(improvedIniGet('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this setting.'),
-			array(improvedIniGet('zlib.output_compression'), 'PHP must not be running with zlib.output_compression enabled. Disable this setting.'),
-			array(improvedIniGet('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this value to Off.'),
+			array(improvedIniGet('output_handler') == 'ob_gzhandler', 'PHP must not be running with output_handler set to ob_gzhandler. Disable this option.'),
+			array(improvedIniGet('zlib.output_compression'), 'PHP must not be running with zlib.output_compression enabled. Disable this option.'),
+			array(improvedIniGet('zend.ze1_compatibility_mode'), 'zend.ze1_compatibility_mode is set to On. This may cause some strange problems. It is strongly suggested to turn this option Off.'),
 		);
 
 		foreach($php_checks as $test)
@@ -618,7 +622,7 @@ h2 {font-size: 125%;}
 			// We need GD 2 and freetype support
 			$gdInfo = @gd_info();
 
-			if(@$gdInfo["GD Version"] && !strstr($gdInfo["GD Version"], '2.'))
+			if(@$gdInfo['GD Version'] && !strstr($gdInfo['GD Version'], '2.'))
 				$this->warnings[__METHOD__][] = $gdFound.'GD Version is older than v2. Please fix this issue.';
 
 			if(!@$gdInfo['FreeType Support'])

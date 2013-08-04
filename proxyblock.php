@@ -5,8 +5,8 @@
 	--------------------
 
 	Created by NewEraCracker
-	Date    2012/01/03
-	Version 1.0.5
+	Date    2013/08/04
+	Version 1.1.0
 
 	Requirements:
 	= PHP 5.2 or higher
@@ -54,10 +54,9 @@ function check_proxy()
 
 	// Init
 	error_reporting(0);
-	ini_set("default_socket_timeout",1);
-	$proxy     = false;
 	$userip    = (string) $_SERVER['REMOTE_ADDR'];
-	$useragent = (string) $_SERVER["HTTP_USER_AGENT"];
+	$useragent = (string) $_SERVER['HTTP_USER_AGENT'];
+	$proxy     = false;
 
 	// Fix configuration
 	if(!$check_ports)
@@ -125,8 +124,8 @@ function check_proxy()
 		$db_link = mysql_connect($db_hostname,$db_username,$db_password) or die(mysql_error());
 		mysql_select_db($db_database) or die(mysql_error());
 
-		$db_setup = "CREATE TABLE IF NOT EXISTS `users` ( `ip` varchar(40) CHARACTER SET latin1 NOT NULL, `proxy` tinyint(1) NOT NULL, `time` DATETIME NOT NULL, UNIQUE KEY `ip` (`ip`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;";
-		$db_query = sprintf( "SELECT * FROM `users` WHERE `ip`='%s'",mysql_real_escape_string($userip) );
+		$db_setup = 'CREATE TABLE IF NOT EXISTS `proxyblock` ( `ip` varchar(40) CHARACTER SET latin1 NOT NULL, `proxy` tinyint(1) unsigned NOT NULL, `time` DATETIME NOT NULL, UNIQUE KEY `ip` (`ip`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;';
+		$db_query = sprintf( "SELECT * FROM `proxyblock` WHERE `ip`='%s'",mysql_real_escape_string($userip) );
 
 		// To select records created in the last 30 minutes
 		$db_query .= " AND `time` > DATE_SUB( NOW(), INTERVAL 30 MINUTE)";
@@ -163,9 +162,7 @@ function check_proxy()
 		{
 			foreach($ports as $port)
 			{
-				$test = fsockopen($userip,$port);
-
-				if($test !== false)
+				if($test = @fsockopen($userip,$port,$errno,$errstr,0.5))
 				{
 					fclose($test);
 					$proxy = true;
@@ -176,8 +173,8 @@ function check_proxy()
 
 		// Delete older result and insert new
 		$proxy = intval($proxy);
-		$db_delete_ip = sprintf( "DELETE FROM `users` WHERE `ip`='%s'",mysql_real_escape_string($userip) );
-		$db_insert_ip = sprintf( "INSERT INTO `users` VALUES ('%s','{$proxy}',NOW())",mysql_real_escape_string($userip) );
+		$db_delete_ip = sprintf( "DELETE FROM `proxyblock` WHERE `ip`='%s'",mysql_real_escape_string($userip) );
+		$db_insert_ip = sprintf( "INSERT INTO `proxyblock` VALUES ('%s','{$proxy}',NOW())",mysql_real_escape_string($userip) );
 		mysql_query($db_delete_ip) or die(mysql_error());
 		mysql_query($db_insert_ip) or die(mysql_error());
 	}

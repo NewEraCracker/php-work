@@ -31,7 +31,6 @@ header('Last-Modified: '.gmdate('D, d M Y H:i:s', $file_time).' GMT');
 
 if(isset($headers['If-Modified-Since']) && (@strtotime($headers['If-Modified-Since']) == $file_time)) {
 	header('HTTP/1.1 304 Not Modified');
-	header('Connection: close');
 	exit();
 } else {
 	header('HTTP/1.1 200 OK');

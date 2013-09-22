@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.1.1
-  @date    2013/08/04
+  @version 3.1.2
+  @date    2013/09/22
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -874,7 +874,10 @@ h2 {font-size: 125%;}
 					{
 						// If we reach this, it means version is set
 						if(version_compare($version, '3.0.7') < 0)
-							$this->warnings[__METHOD__][] = 'You have an old version of NuSphere PhpExpress (earlier than 3.0.7) which is known to cause problems with PHP scripts.';
+							$this->warnings[__METHOD__][] = 'You have an old version of NuSphere PhpExpress (earlier than 3.0.7) which is known to cause problems.';
+
+						if(version_compare($version, '3.0.9') == 0)
+							$this->warnings[__METHOD__][] = 'You have a bugged version of NuSphere PhpExpress (3.0.9) which is known to cause serious problems.';
 
 						break;
 					}

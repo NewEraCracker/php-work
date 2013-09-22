@@ -2,7 +2,7 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.1.2
+  @version 3.2.0
   @date    2013/09/22
   @license Public Domain
 
@@ -97,7 +97,7 @@ function improvedIntVal($value)
 /**
  * Returns the MySQL version integer from a MySQL version string
  */
-function mySqlVersionStringToInt($version)
+function versionStringToInt($version)
 {
 	$version = explode('.', $version);
 	$version = array_map('improvedIntVal', $version);
@@ -108,7 +108,7 @@ function mySqlVersionStringToInt($version)
 /**
  * Returns the MySQL version string from a MySQL version integer
  */
-function mySqlVersionIntToString($version)
+function versionIntToString($version)
 {
 	$version_string = '';
 	$version_remain = (int)($version);
@@ -533,9 +533,9 @@ h2 {font-size: 125%;}
 				if(!function_exists($test) || in_array($test, $this->disabled_functions))
 					$this->warnings[__METHOD__][] = $curlFound.'function '.$test.' is disabled. Please enable it.';
 
-			// We need SSL and ZLIB support
 			if($curlVersion = @curl_version())
 			{
+				// We need SSL and ZLIB support
 				$curlBitFields = array('CURL_VERSION_SSL', 'CURL_VERSION_LIBZ');
 				$curlBitFriendly = array('SSL', 'ZLIB');
 
@@ -544,6 +544,19 @@ h2 {font-size: 125%;}
 					$test = $curlBitFriendly[$arr_key];
 					if(!($curlVersion['features'] && constant($feature)))
 						$this->warnings[__METHOD__][] = $curlFound.$test.' support is missing. Please add support for '.$test.' in cURL.';
+				}
+
+				// If we have OpenSSL loaded, OPENSSL_VERSION_TEXT will be defined.
+				// Compare the OpenSSL versions, they must match.
+				if(isset($curlVersion['ssl_version']) && defined('OPENSSL_VERSION_TEXT'))
+				{
+					if(stripos($curlVersion['ssl_version'], 'openssl') === 0)
+					{
+						$curlssl = versionStringToInt($curlVersion['ssl_version']);
+						$openssl = versionStringToInt(OPENSSL_VERSION_TEXT);
+						if($curlssl != $openssl)
+							$this->warnings[__METHOD__][] = 'Your OpenSSL version ('.versionIntToString($openssl).') does not match the version that cURL is using ('.versionIntToString($curlssl).'). This must be fixed as it may cause unexpected issues.';
+					}
 				}
 			}
 		}
@@ -661,8 +674,8 @@ h2 {font-size: 125%;}
 				}
 				else
 				{
-					$client_version = mySqlVersionStringToInt(mysqli_get_client_info());
-					$server_version = mySqlVersionStringToInt(mysqli_get_server_info($mysqli));
+					$client_version = versionStringToInt(mysqli_get_client_info());
+					$server_version = versionStringToInt(mysqli_get_server_info($mysqli));
 					mysqli_close($mysqli);
 				}
 			}
@@ -677,8 +690,8 @@ h2 {font-size: 125%;}
 				}
 				else
 				{
-					$client_version = mySqlVersionStringToInt(mysql_get_client_info());
-					$server_version = mySqlVersionStringToInt(mysql_get_server_info($mysql));
+					$client_version = versionStringToInt(mysql_get_client_info());
+					$server_version = versionStringToInt(mysql_get_server_info($mysql));
 					mysql_close($mysql);
 				}
 			}
@@ -686,10 +699,10 @@ h2 {font-size: 125%;}
 			if(isset($server_version) && isset($client_version))
 			{
 				if($server_version < 50100)
-					$this->warnings[__METHOD__][] = 'You are running MySQL '.mySqlVersionIntToString($server_version).'. We recommend upgrading to at least MySQL 5.1.';
+					$this->warnings[__METHOD__][] = 'You are running MySQL '.versionIntToString($server_version).'. It is recommended upgrading to MySQL 5.1.';
 
 				if(intAbs($server_version - $client_version) >= 1000)
-					$this->warnings[__METHOD__][] = 'Your PHP MySQL library version ('.mySqlVersionIntToString($client_version).') does not match MySQL Server version ('.mySqlVersionIntToString($server_version).').';
+					$this->warnings[__METHOD__][] = 'Your PHP MySQL library version ('.versionIntToString($client_version).') does not match MySQL Server version ('.versionIntToString($server_version).').';
 			}
 		}
 	}

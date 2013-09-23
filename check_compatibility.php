@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.2.0
-  @date    2013/09/22
+  @version 3.3.0
+  @date    2013/09/23
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -27,6 +27,9 @@ $CONFIG['mysql_pass']    = '';
 
 // Session settings
 $CONFIG['session_enable_extended_check'] = true;
+
+// Allow cURL to connect to google to test SSL
+$CONFIG['curl_test_connect_to_google'] = true;
 
 /* --------------------------
    Functions for calculations
@@ -518,6 +521,9 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_curl()
 	{
+		// Save the 'allowed to connect to Google' setting in a variable
+		$connect_to_google = $GLOBALS['CONFIG']['curl_test_connect_to_google'];
+
 		if(extension_loaded('curl'))
 		{
 			$curlFound = 'The required PHP extension "cURL" was found, but ';
@@ -530,8 +536,16 @@ h2 {font-size: 125%;}
 				'curl_setopt_array', 'curl_setopt', 'curl_version',
 				);
 			foreach($curlFuctions as $test)
+			{
 				if(!function_exists($test) || in_array($test, $this->disabled_functions))
+				{
+					// Force disabling of cURL SSL test as it may fail
+					$connect_to_google = false;
+
+					// Warn the user, this issue must be fixed
 					$this->warnings[__METHOD__][] = $curlFound.'function '.$test.' is disabled. Please enable it.';
+				}
+			}
 
 			if($curlVersion = @curl_version())
 			{
@@ -543,7 +557,13 @@ h2 {font-size: 125%;}
 				{
 					$test = $curlBitFriendly[$arr_key];
 					if(!($curlVersion['features'] && constant($feature)))
+					{
+						// Force disabling of cURL SSL test as it may fail
+						$connect_to_google = false;
+
+						// Warn the user, this issue must be fixed
 						$this->warnings[__METHOD__][] = $curlFound.$test.' support is missing. Please add support for '.$test.' in cURL.';
+					}
 				}
 
 				// If we have OpenSSL loaded, OPENSSL_VERSION_TEXT will be defined.
@@ -555,8 +575,50 @@ h2 {font-size: 125%;}
 						$curlssl = versionStringToInt($curlVersion['ssl_version']);
 						$openssl = versionStringToInt(OPENSSL_VERSION_TEXT);
 						if($curlssl != $openssl)
+						{
+							// Force disabling of cURL SSL test as it will fail (and probably segfault PHP as well)
+							$connect_to_google = false;
+
+							// Warn the user, this issue must be fixed
 							$this->warnings[__METHOD__][] = 'Your OpenSSL version ('.versionIntToString($openssl).') does not match the version that cURL is using ('.versionIntToString($curlssl).'). This must be fixed as it may cause unexpected issues.';
+						}
 					}
+				}
+
+				// Test curl.cainfo if it exists
+				if($cainfo = improvedIniGet('curl.cainfo'))
+				{
+					if(!is_readable($cainfo))
+					{
+						// Force disabling of cURL SSL test as it will fail
+						$connect_to_google = false;
+
+						// Warn the user, this issue must be fixed
+						$this->warnings[__METHOD__][] = 'cURL cannot verify SSL certificates of remote servers due to invalid curl.cainfo setting. Unable to read certificate file ('.$cainfo.').';
+					}
+				}
+
+				// If the above tests did pass, we will do a test connect to google
+				if($connect_to_google)
+				{
+					// Initialize session and set URL.
+					$ch = curl_init();
+					curl_setopt($ch, CURLOPT_URL, 'https://encrypted.google.com/');
+					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+					// curl_exec should return the result.
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+					// Get the response
+					$response = curl_exec($ch);
+
+					// Test response
+					if($response === false)
+						$this->warnings[__METHOD__][] = 'cURL connection to google failed: '.curl_error($ch);
+
+					// Close the channel
+					curl_close($ch);
 				}
 			}
 		}

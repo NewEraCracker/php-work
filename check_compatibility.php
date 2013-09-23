@@ -2,7 +2,7 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.3.0
+  @version 3.3.1
   @date    2013/09/23
   @license Public Domain
 
@@ -615,7 +615,7 @@ h2 {font-size: 125%;}
 
 					// Test response
 					if($response === false)
-						$this->warnings[__METHOD__][] = 'cURL connection to google failed: '.curl_error($ch);
+						$this->warnings[__METHOD__][] = 'cURL connection to google failed: Error '.curl_errno($ch).' ('.curl_error($ch).'). You must fix this issue.';
 
 					// Close the channel
 					curl_close($ch);

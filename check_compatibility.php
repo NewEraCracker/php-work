@@ -615,7 +615,7 @@ h2 {font-size: 125%;}
 
 					// Test response
 					if($response === false)
-						$this->warnings[__METHOD__][] = 'cURL connection to google failed: Error '.curl_errno($ch).' ('.curl_error($ch).'). You must fix this issue.';
+						$this->warnings[__METHOD__][] = 'HTTPS connection to Google via cURL failed: Error '.curl_errno($ch).' ('.curl_error($ch).'). You must fix this issue.';
 
 					// Close the channel
 					curl_close($ch);

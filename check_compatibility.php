@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.3.1
-  @date    2013/09/23
+  @version 3.4.0
+  @date    2013/10/20
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -214,6 +214,14 @@ class Compatibility_Checker
 	}
 
 	/**
+	 * Checks if a certain function is usable
+	 */
+	public function function_usable($function_name)
+	{
+		return (function_exists($function_name) && !in_array($function_name, $this->disabled_functions));
+	}
+
+	/**
 	 * Executor for all tests
 	 */
 	public function run()
@@ -413,7 +421,7 @@ h2 {font-size: 125%;}
 
 		foreach($functions_required as $test)
 		{
-			if(!function_exists($test) || in_array($test, $this->disabled_functions))
+			if(!$this->function_usable($test))
 				$this->warnings[__METHOD__][] = 'Function '.$test.' is required to be enabled in PHP.';
 		}
 	}
@@ -506,7 +514,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_crypt()
 	{
-		if(function_exists('crypt'))
+		if($this->function_usable('crypt'))
 		{
 			$hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
 			$test = crypt('password', $hash);
@@ -537,7 +545,7 @@ h2 {font-size: 125%;}
 				);
 			foreach($curlFuctions as $test)
 			{
-				if(!function_exists($test) || in_array($test, $this->disabled_functions))
+				if(!$this->function_usable($test))
 				{
 					// Force disabling of cURL SSL test as it may fail
 					$connect_to_google = false;
@@ -659,7 +667,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_eaccelerator()
 	{
-		if(function_exists('eaccelerator_info'))
+		if($this->function_usable('eaccelerator_info'))
 		{
 			/*
 			$ea_info = eaccelerator_info();
@@ -679,7 +687,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_ext_gd()
 	{
-		if(function_exists('gd_info'))
+		if($this->function_usable('gd_info'))
 		{
 			$gdFound = 'The required PHP extension "GD Library" was found, but ';
 
@@ -691,7 +699,7 @@ h2 {font-size: 125%;}
 			);
 
 			foreach($required_gd as $test)
-				if(!function_exists($test[0]))
+				if(!$this->function_usable($test[0]))
 					$this->warnings[__METHOD__][] = $gdFound.$test[1].' support is missing. Please add support for '.$test[1].' images in GD Library.';
 
 			// We need GD 2 and freetype support
@@ -726,7 +734,7 @@ h2 {font-size: 125%;}
 			// Just to be sure
 			$mysql_port = (int)$CONFIG['mysql_port'];
 
-			if(function_exists('mysqli_connect'))
+			if($this->function_usable('mysqli_connect'))
 			{
 				$mysqli = @mysqli_connect($CONFIG['mysql_host'], $CONFIG['mysql_user'], $CONFIG['mysql_pass'], '', $mysql_port);
 
@@ -741,7 +749,7 @@ h2 {font-size: 125%;}
 					mysqli_close($mysqli);
 				}
 			}
-			elseif(function_exists('mysql_connect'))
+			elseif($this->function_usable('mysql_connect'))
 			{
 				$mysql_host = $CONFIG['mysql_host'].':'.$mysql_port;
 				$mysql = @mysql_connect($mysql_host, $CONFIG['mysql_user'], $CONFIG['mysql_pass']);
@@ -907,9 +915,9 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_ioncube()
 	{
-		if(extension_loaded('ionCube Loader') && function_exists('ioncube_loader_version'))
+		if(extension_loaded('ionCube Loader') && $this->function_usable('ioncube_loader_version'))
 		{
-			if(!function_exists('ioncube_loader_iversion'))
+			if(!$this->function_usable('ioncube_loader_iversion'))
 				$this->warnings[__METHOD__][] = 'You have a VERY old version of IonCube Loader which is known to cause problems.';
 
 			elseif(ioncube_loader_iversion() < 40400 && version_compare(PHP_VERSION, '5.4') >= 0)
@@ -929,7 +937,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_phpexpress()
 	{
-		if(extension_loaded('NuSphere PhpExpress') && function_exists('phpexpress'))
+		if(extension_loaded('NuSphere PhpExpress') && $this->function_usable('phpexpress'))
 		{
 			// Fetch NuSphere PhpExpress information
 			ob_start();
@@ -967,7 +975,7 @@ h2 {font-size: 125%;}
 	 */
 	private function test_loader_zend()
 	{
-		if(extension_loaded('Zend Optimizer') && function_exists('zend_optimizer_version'))
+		if(extension_loaded('Zend Optimizer') && $this->function_usable('zend_optimizer_version'))
 		{
 			if(version_compare(zend_optimizer_version(), '3.3.3') < 0)
 				$this->warnings[__METHOD__][] = 'You have an old version of Zend Optimizer (earlier than 3.3.3) which is known to cause problems with PHP scripts.';

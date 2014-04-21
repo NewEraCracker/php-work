@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.4.0
-  @date    2013/10/20
+  @version 3.4.1
+  @date    2014/04/21
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -500,9 +500,13 @@ h2 {font-size: 125%;}
 		if(version_compare(PHP_VERSION, '5.2.9') < 0)
 			$this->warnings[__METHOD__][] = 'PHP 5.2.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
-		// If 5.4, check for lower than 5.4.5
-		elseif(version_compare(PHP_VERSION, '5.4') >= 0 && version_compare(PHP_VERSION, '5.4.5') < 0)
-			$this->warnings[__METHOD__][] = 'PHP 5.4.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
+		// If 5.5, check for lower than 5.5.9
+		elseif(version_compare(PHP_VERSION, '5.5') >= 0 && version_compare(PHP_VERSION, '5.5.9') < 0)
+			$this->warnings[__METHOD__][] = 'PHP 5.5.9 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
+
+		// If 5.4, check for lower than 5.4.6
+		elseif(version_compare(PHP_VERSION, '5.4') >= 0 && version_compare(PHP_VERSION, '5.4.6') < 0)
+			$this->warnings[__METHOD__][] = 'PHP 5.4.6 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
 		// If 5.3, check for lower than 5.3.5
 		elseif(version_compare(PHP_VERSION, '5.3') >= 0 && version_compare(PHP_VERSION, '5.3.5') < 0)

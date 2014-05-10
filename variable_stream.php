@@ -1,4 +1,8 @@
 <?php
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
 
 class VariableStream
 {

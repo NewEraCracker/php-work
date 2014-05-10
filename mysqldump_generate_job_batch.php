@@ -1,4 +1,9 @@
 <?php
+/*
+ Author: NewEraCracker
+ License: Public Domain
+*/
+
 // Stop unwanted access
 if(PHP_SAPI != 'cli'){ exit(); }
 

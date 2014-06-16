@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.4.1
-  @date    2014/04/21
+  @version 3.4.2
+  @date    2014/06/16
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -77,7 +77,7 @@ function improvedIntVal($value)
 	$found = false;
 
 	// Build
-	for($i = 0; $i < strlen($value); $i++)
+	for($i=0, $sz=strlen($value); $i<$sz; $i++)
 	{
 		// Found a number ?
 		if(is_numeric($value[$i]))
@@ -91,10 +91,9 @@ function improvedIntVal($value)
 			break;
 		}
 	}
-	$value = $new;
 
 	// Return the result
-	return (int)$value;
+	return (int)$new;
 }
 
 /**
@@ -508,9 +507,9 @@ h2 {font-size: 125%;}
 		elseif(version_compare(PHP_VERSION, '5.4') >= 0 && version_compare(PHP_VERSION, '5.4.6') < 0)
 			$this->warnings[__METHOD__][] = 'PHP 5.4.6 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 
-		// If 5.3, check for lower than 5.3.5
-		elseif(version_compare(PHP_VERSION, '5.3') >= 0 && version_compare(PHP_VERSION, '5.3.5') < 0)
-			$this->warnings[__METHOD__][] = 'PHP 5.3.5 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
+		// If 5.3, check for lower than 5.3.10
+		elseif(version_compare(PHP_VERSION, '5.3') >= 0 && version_compare(PHP_VERSION, '5.3.10') < 0)
+			$this->warnings[__METHOD__][] = 'PHP 5.3.10 or newer is required. '.PHP_VERSION.' does not meet this requirement.';
 	}
 
 	/**

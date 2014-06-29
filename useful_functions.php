@@ -7,18 +7,12 @@
 /** Array with the paths a dir contains */
 function readdir_recursive($dir, $show_dirs=false)
 {
-	return explode("\n", readdir_recursive_string($dir, $show_dirs));
+	return explode("\n", ltrim(readdir_recursive_string($dir, $show_dirs)));
 }
 
 /** String with the paths a dir contains */
-function readdir_recursive_string($dir, $show_dirs=false, $dir_len=null)
+function readdir_recursive_string($dir='.', $show_dirs=false)
 {
-	// Be sure about dir
-	$dir = realpath($dir);
-
-	// Calculate the length if we don't know it
-	if($dir_len == null) $dir_len = strlen($dir);
-
 	// Fun begins
 	$ok = ob_start(null);
 	if( !$ok )
@@ -31,33 +25,33 @@ function readdir_recursive_string($dir, $show_dirs=false, $dir_len=null)
 	$dh = opendir($dir);
 
 	// Read the dir
-	while( $dh && (false !== ($file = readdir($dh))) )
+	while( $dh && (false !== ($path = readdir($dh))) )
 	{
-		if( $file != '.' && $file != '..')
+		if( $path != '.' && $path != '..')
 		{
-			$file = realpath($dir.'/'.$file);
-			if( is_dir($file) )
+			$path = $dir.'/'.$path;
+			if( is_dir($path) )
 			{
 				// If $show_dirs is true, dir names will also be listed
 				if( $show_dirs )
 				{
-					echo "\n".substr($file, $dir_len);
+					echo "\n".$path;
 				}
 
 				// Read recursively another dir below the original dir
 				// We pass $dir_len here so the path is relative to the 'mother' dir
-				echo "\n".readdir_recursive_string($file, $show_dirs, $dir_len);
+				echo readdir_recursive_string($path, $show_dirs);
 			}
-			else
+			elseif( is_file($path) )
 			{
 				// Just echo the filename
-				echo "\n".substr($file, $dir_len);
+				echo "\n".$path;
 			}
 		}
 	}
 
 	// Get and return our result
-	return ltrim(ob_get_clean());
+	return ob_get_clean();
 }
 
 /** Normalize a text file by trimming extra whitespace */

@@ -5,7 +5,7 @@
 */
 
 /** Array with the paths a dir contains */
-function readdir_recursive($dir, $show_dirs=false)
+function readdir_recursive($dir='.', $show_dirs=false)
 {
 	return explode("\n", ltrim(readdir_recursive_string($dir, $show_dirs)));
 }

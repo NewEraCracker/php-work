@@ -28,21 +28,7 @@ class NewEra_IPv6Hack
 		elseif(strpos($ip, ':') !== false)
 		{
 			// Expand IPv6
-			$ip  = explode(':', $ip);
-			$res = '';
-			foreach($ip as $seg)
-			{
-				if($seg == '')
-				{
-					// This will expand a compacted IPv6
-					$res .= str_pad('', (((8 - count($ip)) + 1) * 4), '0', STR_PAD_LEFT);
-				}
-				else
-				{
-					// This will pad to ensure each IPv6 part has 4 digits.
-					$res .= str_pad($seg, 4, '0', STR_PAD_LEFT);
-				}
-			}
+			$ip = self::ipv6_expand($ip);
 
 			// Pack IPv6
 			$ip = pack('H'.strlen($res), $res);
@@ -106,10 +92,9 @@ class NewEra_IPv6Hack
 		return $ip;
 	}
 
-	/** Shift an IPv6 to right (IPv6 >> 1). This will be handy to generate a fake IPv4 */
-	public static function ipv6_shift_right($ip)
+	/** Expand an IPv6 address */
+	public static function ipv6_expand($ip)
 	{
-		// Expand IPv6
 		$ip  = explode(':', $ip);
 		$res = '';
 		foreach($ip as $seg)
@@ -126,7 +111,13 @@ class NewEra_IPv6Hack
 			}
 		}
 
-		$ip = $res;
+		return $res;
+	}
+
+	/** Shift an IPv6 to right (IPv6 >> 1). This will be handy to generate a fake IPv4 */
+	public static function ipv6_shift_right($ip)
+	{
+		$ip = self::ipv6_expand($ip);
 		$ip = substr($ip, -1).substr($ip, 0, -1);
 		$ip = substr(chunk_split($ip, 4, ':'), 0, -1);
 
@@ -136,6 +127,11 @@ class NewEra_IPv6Hack
 	/** Create a fake IPv4 address from a given IPv6 address */
 	public static function ipv6_to_ipv4($ip)
 	{
+		if(strpos($ip, ':') === false || strpos($ip, '.') !== false)
+		{
+			return false;
+		}
+
 		$ip = self::ipv6_shift_right($ip);
 		$ip = self::ip_pack($ip);
 

@@ -1,13 +1,14 @@
 <?php
-/* IPv6 to IPv4, a dirty hack
+/**
+ * This script will create a fake IPv4 for IPv6 users based on the 52 first bits of their IP.
  *
- * This will create a fake IPv4 for IPv6 users based on the 52 first bits of their IP.
+ * @author  NewEraCracker
+ * @version 1.0.5
+ * @date    2014/07/01
+ * @license Public Domain
  *
  * It is usually unlikely for someone to obtain a different generated IPv4 without access
  * to more than a /52.
- *
- * Author: NewEraCracker
- * License: Public Domain
  */
 
 $_SERVER['REMOTE_ADDR'] = NewEra_IPv6Hack::all_to_ipv4($_SERVER['REMOTE_ADDR']);

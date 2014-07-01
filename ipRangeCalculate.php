@@ -18,22 +18,23 @@ if ( !function_exists('inet_pton'))
 		elseif(strpos($ip, ':') !== FALSE)
 		{
 			// Expand ipv6
-			$_count = count(explode(':', $ip));
-			while($_count<=8)
+			$ip  = explode(':', $ip);
+			$res = '';
+			foreach($ip as $seg)
 			{
-				$ip = str_replace('::',':0::',$ip);
-				$_count++;
+				if($seg == '')
+				{
+					// This will expand a compacted IPv6
+					$res .= str_pad('', (((8 - count($ip)) + 1) * 4), '0', STR_PAD_LEFT);
+				}
+				else
+				{
+					// This will pad to ensure each IPv6 part has 4 digits.
+					$res .= str_pad($seg, 4, '0', STR_PAD_LEFT);
+				}
 			}
-			unset($_count);
-			$ip = str_replace('::',':',$ip);
 
 			// Pack ipv6
-			$ip = explode(':', $ip);
-			$res = str_pad('', (4*(8-count($ip))), '0000', STR_PAD_LEFT);
-			foreach ($ip as $seg)
-			{
-				$res .= str_pad($seg, 4, '0', STR_PAD_LEFT);
-			}
 			$ip = pack('H'.strlen($res), $res);
 		}
 		else

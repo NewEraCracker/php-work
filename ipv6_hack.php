@@ -31,7 +31,7 @@ class NewEra_IPv6Hack
 			$ip = self::ipv6_expand($ip);
 
 			// Pack IPv6
-			$ip = pack('H'.strlen($res), $res);
+			$ip = pack('H'.strlen($ip), $ip);
 
 			return $ip;
 		}
@@ -44,9 +44,9 @@ class NewEra_IPv6Hack
 	{
 		if(strlen($ip) == 4)
 		{
-			// Unpack IPv6
-			list(, $ip)=unpack('N', $ip);
-			$ip=long2ip($ip);
+			// Unpack IPv4
+			list(, $ip) = unpack('N', $ip);
+			$ip = long2ip($ip);
 		}
 		elseif(strlen($ip) == 16)
 		{

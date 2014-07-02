@@ -1,14 +1,13 @@
 <?php
 /**
- * This script will create a fake IPv4 for IPv6 users based on the 52 first bits of their IP.
+ * This script will generate a pseudo IPv4 in Class E IP space (240.0.0.0 - 255.255.255.255)
+ * for IPv6 users based on the 52 first bits of their IP. Class E address space is reserved
+ * as experimental and no actual traffic should originate from it.
  *
  * @author  NewEraCracker
- * @version 1.0.8
+ * @version 1.0.9
  * @date    2014/07/02
  * @license Public Domain
- *
- * It is usually unlikely for someone to obtain a different generated IPv4 without access
- * to more than a /52.
  */
 
 $_SERVER['REMOTE_ADDR'] = NewEra_IPv6Hack::all_to_ipv4($_SERVER['REMOTE_ADDR']);
@@ -60,12 +59,7 @@ class NewEra_IPv6Hack
 			$res = '';
 			for($i = (count($ip)-1); $i >= 0; $i--)
 			{
-				$seg = $ip[$i];
-
-				while($seg != '' && $seg[0] == '0')
-				{
-					$seg = substr($seg, 1);
-				}
+				$seg = ltrim($ip[$i], '0');
 
 				if($seg != '')
 				{
@@ -146,7 +140,7 @@ class NewEra_IPv6Hack
 		// First 8 bits of IPv4 will be:
 		// - The last 4 bits of unshifted IPv6, all set to true via mask
 		// - The first 4 bits of unshifted IPv6, all in their original state via mask
-		// This ensures an IPv4 in Class E range (240.0.0.0 - 255.255.255.255)
+		// This ensures an IPv4 in Class E space (240.0.0.0 - 255.255.255.255)
 		$ipv4 = chr(ord($ip[0]) | 0xf0);
 
 		for($i=1;$i<7;$i+=2)

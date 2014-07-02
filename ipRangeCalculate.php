@@ -1,7 +1,7 @@
 <?php
 /**
  * @author  NewEraCracker
- * @version 1.0.8
+ * @version 1.0.9
  * @date    2014/07/02
  * @license Public Domain
  */
@@ -74,12 +74,7 @@ if ( !function_exists('inet_ntop'))
 			$res = '';
 			for($i = (count($ip)-1); $i >= 0; $i--)
 			{
-				$seg = $ip[$i];
-
-				while($seg != '' && $seg[0] == '0')
-				{
-					$seg = substr($seg, 1);
-				}
+				$seg = ltrim($ip[$i], '0');
 
 				if($seg != '')
 				{

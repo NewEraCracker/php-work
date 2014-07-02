@@ -1,7 +1,7 @@
 <?php
 /**
  * @author  NewEraCracker
- * @version 1.0.9
+ * @version 2.0.0
  * @date    2014/07/02
  * @license Public Domain
  */
@@ -67,14 +67,13 @@ if ( !function_exists('inet_ntop'))
 		{
 			// Unpack IPv6
 			$ip = bin2hex($ip);
-			$ip = substr(chunk_split($ip, 4, ':'), 0, -1);
 
 			// Compact IPv6
-			$ip  = explode(':',$ip);
 			$res = '';
-			for($i = (count($ip)-1); $i >= 0; $i--)
+			for($i = strlen($ip); $i > 0; $i = ($i-4))
 			{
-				$seg = ltrim($ip[$i], '0');
+				$seg = substr($ip, $i-4, 4);
+				$seg = ltrim($seg, '0');
 
 				if($seg != '')
 				{
@@ -85,7 +84,7 @@ if ( !function_exists('inet_ntop'))
 					if(strpos($res, '::') === false)
 					{
 						// @Hack : Check iteration number to make sure ::1 case is handled
-						if($res != '' && $res[0] == ':' && $i > 0)
+						if($res != '' && $res[0] == ':' && $i > 4)
 						{
 							continue;
 						}

@@ -1,31 +1,39 @@
 <?php
-/*
- Author: NewEraCracker
- License: Public Domain
+/**
+ * @author  NewEraCracker
+ * @version 1.0.6
+ * @date    2014/07/02
+ * @license Public Domain
 */
 
-//@link: http://php.net/manual/en/function.inet-pton.php
+/** @Link : http://php.net/manual/en/function.inet-pton.php */
 if ( !function_exists('inet_pton'))
 {
 	function inet_pton($ip)
 	{
-		if(strpos($ip, '.') !== FALSE)
+		if(strpos($ip, '.') !== false)
 		{
-			// Pack ipv4
-			$ip = trim($ip,':f');
-			$ip = pack('N',ip2long($ip));
+			// Pack IPv4
+			$ip = trim($ip, ':f');
+			$ip = pack('N', ip2long($ip));
+
+			return $ip;
 		}
-		elseif(strpos($ip, ':') !== FALSE)
+		elseif(strpos($ip, ':') !== false)
 		{
-			// Expand ipv6
-			$ip  = explode(':', $ip);
+			// Expand IPv6
+			$ip = explode(':', $ip);
 			$res = '';
+			$expand = true;
 			foreach($ip as $seg)
 			{
-				if($seg == '')
+				if($seg == '' && $expand)
 				{
 					// This will expand a compacted IPv6
 					$res .= str_pad('', (((8 - count($ip)) + 1) * 4), '0', STR_PAD_LEFT);
+
+					// We only expand once, else it would cause troubles with ::1 or ffff::
+					$expand = false;
 				}
 				else
 				{
@@ -34,61 +42,62 @@ if ( !function_exists('inet_pton'))
 				}
 			}
 
-			// Pack ipv6
+			// Pack IPv6
 			$ip = pack('H'.strlen($res), $res);
-		}
-		else
-		{
-			return false;
-		}
 
-		if(strlen($ip)==4 || strlen($ip)==16)
-		{
 			return $ip;
 		}
-		else
-		{
-			return false;
-		}
 
+		return false;
 	}
 }
 
-//@link: http://php.net/manual/en/function.inet-ntop.php
+/** @Link : http://php.net/manual/en/function.inet-ntop.php */
 if ( !function_exists('inet_ntop'))
 {
-	function inet_ntop($ip){
-		if(strlen($ip)==4)
+	function inet_ntop($ip)
+	{
+		if(strlen($ip) == 4)
 		{
-			// Unpack ipv4
-			list(,$ip)=unpack('N',$ip);
-			$ip=long2ip($ip);
+			// Unpack IPv4
+			list(, $ip) = unpack('N', $ip);
+			$ip = long2ip($ip);
 		}
-		elseif(strlen($ip)==16)
+		elseif(strlen($ip) == 16)
 		{
-			// Unpack ipv6
-			$ip=bin2hex($ip);
-			$ip=substr(chunk_split($ip,4,':'),0,-1);
-			$ip=explode(':',$ip);
-			$res='';
+			// Unpack IPv6
+			$ip = bin2hex($ip);
+			$ip = substr(chunk_split($ip, 4, ':'), 0, -1);
+
+			// Compact IPv6
+			$ip  = explode(':',$ip);
+			$res = '';
 			foreach($ip as $seg)
 			{
-				while($seg{0}=='0') $seg=substr($seg,1);
-				if($seg!='')
+				while($seg != '' && $seg[0] == '0')
 				{
-					$res.=($res==''?'':':').$seg;
+					$seg = substr($seg, 1);
+				}
+
+				if($seg != '')
+				{
+					$res .= ($res==''?'':':').$seg;
 				}
 				else
 				{
-					if (strpos($res,'::')===false) {
-						if (substr($res,-1)==':') continue;
-						$res.=':';
+					if(strpos($res,'::') === false)
+					{
+						if(substr($res, -1) == ':')
+						{
+							continue;
+						}
+						$res .= ':';
 						continue;
 					}
-					$res.=($res==''?'':':').'0';
+					$res .= ($res==''?'':':').'0';
 				}
 			}
-			$ip=$res;
+			$ip = $res;
 		}
 		else
 		{
@@ -141,12 +150,12 @@ function ipRangeCalculate( $ip, $range )
 	}
 
 	// Pack IP, Set some vars
-	$ip_pack	   = inet_pton($ip_address);
-	$ip_pack_size  = strlen($ip_pack);
-	$ip_bits_size  = $ip_pack_size*8;
+	$ip_pack	  = inet_pton($ip_address);
+	$ip_pack_size = strlen($ip_pack);
+	$ip_bits_size = $ip_pack_size*8;
 
 	// IP bits (lots of 0's and 1's)
-	$ip_bits = "";
+	$ip_bits = '';
 	for($i=0; $i < $ip_pack_size; $i=$i+1)
 	{
 		$bit = decbin( ord($ip_pack[$i]) );

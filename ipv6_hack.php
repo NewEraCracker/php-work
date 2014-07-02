@@ -3,8 +3,8 @@
  * This script will create a fake IPv4 for IPv6 users based on the 52 first bits of their IP.
  *
  * @author  NewEraCracker
- * @version 1.0.5
- * @date    2014/07/01
+ * @version 1.0.6
+ * @date    2014/07/02
  * @license Public Domain
  *
  * It is usually unlikely for someone to obtain a different generated IPv4 without access
@@ -96,14 +96,18 @@ class NewEra_IPv6Hack
 	/** Expand an IPv6 address */
 	public static function ipv6_expand($ip)
 	{
-		$ip  = explode(':', $ip);
+		$ip = explode(':', $ip);
 		$res = '';
+		$expand = true;
 		foreach($ip as $seg)
 		{
-			if($seg == '')
+			if($seg == '' && $expand)
 			{
 				// This will expand a compacted IPv6
 				$res .= str_pad('', (((8 - count($ip)) + 1) * 4), '0', STR_PAD_LEFT);
+
+				// We only expand once, else it would cause troubles with ::1 or ffff::
+				$expand = false;
 			}
 			else
 			{

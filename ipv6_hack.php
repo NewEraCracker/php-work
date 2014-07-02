@@ -3,7 +3,7 @@
  * This script will create a fake IPv4 for IPv6 users based on the 52 first bits of their IP.
  *
  * @author  NewEraCracker
- * @version 1.0.6
+ * @version 1.0.7
  * @date    2014/07/02
  * @license Public Domain
  *
@@ -58,7 +58,7 @@ class NewEra_IPv6Hack
 			// Compact IPv6
 			$ip  = explode(':',$ip);
 			$res = '';
-			foreach($ip as $seg)
+			foreach($ip as $key => $seg)
 			{
 				while($seg != '' && $seg[0] == '0')
 				{
@@ -73,7 +73,8 @@ class NewEra_IPv6Hack
 				{
 					if(strpos($res,'::') === false)
 					{
-						if(substr($res, -1) == ':')
+						// @Hack : Check iteration number to make sure ffff:: case is handled
+						if(substr($res, -1) == ':' && $key < (count($ip)-1))
 						{
 							continue;
 						}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author  NewEraCracker
- * @version 1.0.6
+ * @version 1.0.7
  * @date    2014/07/02
  * @license Public Domain
 */
@@ -72,7 +72,7 @@ if ( !function_exists('inet_ntop'))
 			// Compact IPv6
 			$ip  = explode(':',$ip);
 			$res = '';
-			foreach($ip as $seg)
+			foreach($ip as $key => $seg)
 			{
 				while($seg != '' && $seg[0] == '0')
 				{
@@ -87,7 +87,8 @@ if ( !function_exists('inet_ntop'))
 				{
 					if(strpos($res,'::') === false)
 					{
-						if(substr($res, -1) == ':')
+						// @Hack : Check iteration number to make sure ffff:: case is handled
+						if(substr($res, -1) == ':' && $key < (count($ip)-1))
 						{
 							continue;
 						}

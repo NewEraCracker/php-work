@@ -5,8 +5,8 @@
  * as experimental and no actual traffic should originate from it.
  *
  * @author  NewEraCracker
- * @version 2.0.0
- * @date    2014/07/02
+ * @version 2.0.1
+ * @date    2014/07/03
  * @license Public Domain
  */
 
@@ -47,6 +47,8 @@ class NewEra_IPv6Hack
 			// Unpack IPv4
 			list(, $ip) = unpack('N', $ip);
 			$ip = long2ip($ip);
+
+			return $ip;
 		}
 		elseif(strlen($ip) == 16)
 		{
@@ -66,9 +68,10 @@ class NewEra_IPv6Hack
 				}
 				else
 				{
-					if(strpos($res, '::') === false)
+					// Make sure 0:2:3:4:5:6:7:8 is handled
+					if(strpos($res, '::') === false && substr_count($res, ':') < 6)
 					{
-						// @Hack : Check iteration number to make sure ::1 case is handled
+						// Make sure ::1 is handled
 						if($res != '' && $res[0] == ':' && $i > 4)
 						{
 							continue;
@@ -79,14 +82,11 @@ class NewEra_IPv6Hack
 					$res = '0'.($res==''?'':':').$res;
 				}
 			}
-			$ip = $res;
-		}
-		else
-		{
-			return false;
+
+			return $res;
 		}
 
-		return $ip;
+		return false;
 	}
 
 	/** Expand an IPv6 address */
@@ -102,7 +102,7 @@ class NewEra_IPv6Hack
 				// This will expand a compacted IPv6
 				$res .= str_pad('', (((8 - count($ip)) + 1) * 4), '0', STR_PAD_LEFT);
 
-				// We only expand once, else it would cause troubles with ::1 or ffff::
+				// Only expand once, otherwise it will cause troubles with ::1 or ffff::
 				$expand = false;
 			}
 			else

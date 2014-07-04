@@ -21,10 +21,8 @@ function readdir_recursive_string($dir='.', $show_dirs=false)
 		return '';
 	}
 
-	// Open the dir
+	// Open and read the dir
 	$dh = opendir($dir);
-
-	// Read the dir
 	while( $dh && (false !== ($path = readdir($dh))) )
 	{
 		if( $path != '.' && $path != '..')
@@ -49,6 +47,7 @@ function readdir_recursive_string($dir='.', $show_dirs=false)
 			}
 		}
 	}
+	closedir($dh);
 
 	// Get and return our result
 	return ob_get_clean();

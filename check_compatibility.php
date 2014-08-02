@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.4.2
-  @date    2014/06/16
+  @version 3.4.3
+  @date    2014/08/02
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -355,6 +355,25 @@ h2 {font-size: 125%;}
 
 		if((string)$num1 === (string)$num2 || $num1 === $num2 || $num2 <= (string)$num1)
 			$this->warnings[__METHOD__][] = 'Detected unexpected problem in handling of PHP float numbers.';
+	}
+
+	/**
+	 * Test for PHP bug #53829 (Compiling PHP with large file support will replace function gzopen by gzopen64)
+	 * @see https://bugs.php.net/bug.php?id=53829
+	 */
+	private function test_bug_bad_zlib()
+	{
+		if(extension_loaded('zlib'))
+		{
+			if(function_exists('gzopen') && !$this->function_usable('gzopen'))
+			{
+				$this->warnings[__METHOD__][] = 'Function gzopen is required to be enabled in PHP.';
+			}
+			if(!function_exists('gzopen') && function_exists('gzopen64'))
+			{
+				$this->warnings[__METHOD__][] = 'Your PHP install is affected by bug #53829. This is caused by a bad zlib version. You will have to recompile PHP with a version not affected by this bug.';
+			}
+		}
 	}
 
 	/**

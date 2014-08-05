@@ -21,7 +21,7 @@ function readdir_recursive_string($dir='.', $show_dirs=false)
 		return '';
 	}
 
-	// Open and read the dir
+	// Open and read dir
 	$dh = opendir($dir);
 	while( $dh && (false !== ($path = readdir($dh))) )
 	{
@@ -37,12 +37,11 @@ function readdir_recursive_string($dir='.', $show_dirs=false)
 				}
 
 				// Read recursively another dir below the original dir
-				// We pass $dir_len here so the path is relative to the 'mother' dir
 				echo readdir_recursive_string($path, $show_dirs);
 			}
 			elseif( is_file($path) )
 			{
-				// Just echo the filename
+				// Echo filename
 				echo "\n".$path;
 			}
 		}

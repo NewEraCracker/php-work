@@ -79,7 +79,7 @@ while( $tables = db_fetch($show_tables_result) )
 	foreach( $tables as $table )
 	{
 		/* Change each table collation */
-		db_query("OPTIMIZE TABLE {$table}");
+		db_query("OPTIMIZE TABLE `{$table}`");
 	}
 }
 

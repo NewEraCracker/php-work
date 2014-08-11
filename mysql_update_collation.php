@@ -76,7 +76,7 @@ function db_fetch($result)
 db_connect();
 
 /* Change default db collation */
-db_query("ALTER DATABASE {$dbname} DEFAULT CHARACTER SET {$dbcharset} DEFAULT COLLATE {$dbcollation}");
+db_query("ALTER DATABASE `{$dbname}` DEFAULT CHARACTER SET {$dbcharset} DEFAULT COLLATE {$dbcollation}");
 
 /* Grab the tables */
 $show_tables_result = db_query('SHOW TABLES');
@@ -86,7 +86,7 @@ while( $tables = db_fetch($show_tables_result) )
 	foreach( $tables as $table )
 	{
 		/* Change each table collation */
-		db_query("ALTER TABLE {$table} CONVERT TO CHARACTER SET {$dbcharset} COLLATE {$dbcollation}");
+		db_query("ALTER TABLE `{$table}` CONVERT TO CHARACTER SET {$dbcharset} COLLATE {$dbcollation}");
 	}
 }
 

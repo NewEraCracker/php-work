@@ -4,10 +4,13 @@
  License: Public Domain
 */
 
+/* Stop unwanted access */
+if(PHP_SAPI != 'cli'){ die("This script must be ran from CLI.\n"); }
+
 /* Database details */
 $dbhost = '127.0.0.1';
 $dbuser = 'root';
-$dbpass = '123456';
+$dbpass = '****';
 $dbname = 'wordpress';
 
 /* Collation to change to */
@@ -16,7 +19,7 @@ $dbcollation = 'utf8_general_ci';
 
 /* Database globals */
 $dblink = null;
-$dbtype = ( function_exists('mysqli') ? 'mysqli' : ( function_exists('mysql') ? 'mysql' : null ) );
+$dbtype = extension_loaded('mysqli') ? 'mysqli' : (extension_loaded('mysql') ? 'mysql' : null);
 
 /* Function: Connect and select the database */
 function db_connect()
@@ -31,6 +34,11 @@ function db_connect()
 	else if( $dbtype == 'mysqli' )
 	{
 		$dblink = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+	}
+
+	if( !$dblink )
+	{
+		die("Connection to database failed!\n");
 	}
 }
 
@@ -82,5 +90,5 @@ while( $tables = db_fetch($show_tables_result) )
 	}
 }
 
-echo "The collation of your database has been successfully changed!";
+echo "The collation of your database has been successfully changed!\n";
 ?>

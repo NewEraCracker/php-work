@@ -5,7 +5,7 @@
 */
 
 // Stop unwanted access
-if(PHP_SAPI != 'cli'){ exit(); }
+if(PHP_SAPI != 'cli'){ die("This script must be ran from CLI.\n"); }
 
 // Define MySQL database root
 define('DB_BIN_PATH', 'C:/server/bin/mysql/bin');

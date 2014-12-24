@@ -1,12 +1,12 @@
 <?php
 /**
- * Usage: dumplist.php [check|testmd5|generate|update]
+ * Usage: dumplist.php [check|testmd5|generate|update|touchdir]
  *
  * From the shadows. We shall rise...
  *
  * @Author  NewEraCracker
  * @License Public Domain
- * @Version 1.0.7
+ * @Version 1.1.0
  */
 
 /** Run */
@@ -70,7 +70,7 @@ class NewEra_DumpListUtil
 	public static function generate_listfile($fileproperties)
 	{
 		// Sort file properties array
-		ksort($fileproperties, SORT_STRING);
+		uksort($fileproperties, 'NewEra_Compare::sort_files_by_name');
 
 		// Init contents of list file
 		$comment = $content = '';
@@ -138,6 +138,46 @@ class NewEra_DumpListUtil
 	}
 }
 
+/* Useful comparators */
+class NewEra_Compare
+{
+	/* Ascending directory sorting by names */
+	public static function sort_files_by_name($a, $b)
+	{
+		/* Equal */
+		if($a == $b)
+		{
+			return 0;
+		}
+
+		/* Let strcmp decide */
+		return strcmp($a, $b);
+	}
+
+	/* Ascending directory sorting by levels and names */
+	public static function sort_files_by_level_asc($a, $b)
+	{
+		/* Equal */
+		if($a == $b)
+		{
+			return 0;
+		}
+
+		/* Check dir levels */
+		$la = substr_count($a, '/');
+		$lb = substr_count($b, '/');
+
+		/* Prioritize levels, in case of equality let sorting by names decide */
+		return (($la < $lb) ? -1 : (($la == $lb) ? self::sort_files_by_name($a, $b) : 1));
+	}
+
+	/* Reverse directory sorting by levels and names */
+	public static function sort_files_by_level_dsc($a, $b)
+	{
+		return self::sort_files_by_level_asc($b, $a);
+	}
+}
+
 /** Methods used in dump listing */
 class NewEra_DumpList
 {
@@ -173,7 +213,7 @@ class NewEra_DumpList
 		// Check arguments count
 		if($_SERVER['argc'] != 2)
 		{
-			die('Usage: '.basename(__FILE__)." [check|testmd5|generate|update]\n");
+			die('Usage: '.basename(__FILE__)." [check|testmd5|generate|update|touchdir]\n");
 		}
 
 		// Change dir
@@ -194,8 +234,11 @@ class NewEra_DumpList
 			case 'update':
 				$this->dumplist_update();
 				break;
+			case 'touchdir':
+				$this->dumplist_touchdir();
+				break;
 			default:
-				die('Usage: '.basename(__FILE__).' [check|testmd5|generate|update]');
+				die('Usage: '.basename(__FILE__)." [check|testmd5|generate|update|touchdir]\n");
 		}
 	}
 
@@ -219,7 +262,7 @@ class NewEra_DumpList
 				{
 					if(is_dir($ignored) && strpos($file, $ignored) === 0)
 					{
-						continue;
+						continue 2;
 					}
 				}
 			}
@@ -282,7 +325,7 @@ class NewEra_DumpList
 				{
 					if(is_dir($ignored) && strpos($file, $ignored) === 0)
 					{
-						continue;
+						continue 2;
 					}
 				}
 			}
@@ -317,7 +360,7 @@ class NewEra_DumpList
 				{
 					if(is_dir($ignored) && strpos($file, $ignored) === 0)
 					{
-						continue;
+						continue 2;
 					}
 				}
 			}
@@ -368,6 +411,90 @@ class NewEra_DumpList
 
 		$contents = NewEra_DumpListUtil::generate_listfile($this->fileproperties);
 		file_put_contents($this->listfile, $contents);
+	}
+
+	private function dumplist_touchdir()
+	{
+		// Filelist including directories
+		$list_with_dirs = NewEra_DumpListUtil::readdir_recursive('.', true);
+
+		// Filelist without directories
+		$this->filelist = NewEra_DumpListUtil::readdir_recursive();
+
+		// http://php.net/manual/en/function.touch.php#refsect1-function.touch-changelog
+		if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && version_compare(PHP_VERSION, '5.3') < 0)
+		{
+			// This method will not work on Windows with PHP versions lower than 5.3
+			return false;
+		}
+
+		// Handle filelist including directories and then
+		// make another pass with filelist without directories
+		foreach(array($list_with_dirs, $this->filelist) as $list)
+		{
+			// Easier with a bottom to top approach
+			usort($list, 'NewEra_Compare::sort_files_by_level_dsc');
+
+			// Reset internal variables state
+			$dir = $time = null;
+
+			// Handle one specific list at a time
+			foreach($list as $file)
+			{
+				// Reset internal variables state when moving to another dir
+				if($dir !== dirname($file))
+				{
+					$dir  = dirname($file);
+					$time = 0;
+				}
+
+				// Take in account ignored paths
+				if(count($this->ignored))
+				{
+					// Check ignored files
+					if(in_array($file, $this->ignored))
+					{
+						continue;
+					}
+
+					// Check ignored dirs
+					foreach($this->ignored as $ignored)
+					{
+						if(is_dir($ignored) && strpos($file, $ignored) === 0)
+						{
+							continue 2;
+						}
+					}
+				}
+
+				// Additionally blacklist certain names
+				if(	false !== stripos($file, '/desktop.ini') ||
+					false !== stripos($file, '/.'))
+				{
+					continue;	
+				}
+
+				// Compare current time with previous
+				$mtime = @filemtime($file);
+
+				// Only update when $mtime is higher than $time
+				if($mtime > 0 && $mtime > $time)
+				{
+					$time = $mtime;
+				}
+
+				// Be sure $time is correctly set and ddditionally
+				// check for writability to prevent errors
+				if($time > 0 && is_writable($dir))
+				{
+					// Update dir timestamp
+					touch($dir, $time);
+				}
+			}
+		}
+
+		// I think we should be OK
+		return true;
 	}
 }
 ?>

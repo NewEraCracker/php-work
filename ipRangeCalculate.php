@@ -72,7 +72,7 @@ if ( !function_exists('inet_ntop'))
 
 			// Compact IPv6
 			$res = '';
-			for($i = strlen($ip); $i > 0; $i = ($i-4))
+			for($i = strlen($ip); $i >= 4; $i = ($i-4))
 			{
 				$seg = substr($ip, $i-4, 4);
 				$seg = ltrim($seg, '0');

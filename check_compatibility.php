@@ -2,8 +2,8 @@
 /*
   Helps checking compatibility with IP.Board and other scripts
   @author  NewEraCracker
-  @version 3.4.3
-  @date    2014/08/02
+  @version 3.4.4
+  @date    2014/12/29
   @license Public Domain
 
   Inspired by all noobish hosting companies around the world
@@ -450,8 +450,8 @@ h2 {font-size: 125%;}
 	private function test_core_max_input_vars()
 	{
 		$tmp = improvedIniGet('max_input_vars');
-		if(strlen($tmp) > 0 && $tmp < 4096) // This setting was added in PHP 5.3.9 but some distros backported it to older PHP versions
-			$this->warnings[__METHOD__][] = 'Problematic max_input_vars setting detected, please set it to 4096 or higher.';
+		if(strlen($tmp) > 0 && $tmp < 5120) // This setting was added in PHP 5.3.9 but some distros backported it to older PHP versions
+			$this->warnings[__METHOD__][] = 'Problematic max_input_vars setting detected, please set it to 5120 or higher.';
 	}
 
 	/**
@@ -853,25 +853,27 @@ h2 {font-size: 125%;}
 			$test_values = array(
 				array('suhosin.cookie.max_name_length', 64),
 				array('suhosin.cookie.max_totalname_length', 256),
+				array('suhosin.cookie.max_vars', 100),
 				array('suhosin.cookie.max_value_length', 10000),
 				array('suhosin.get.max_name_length', 512),
 				array('suhosin.get.max_totalname_length', 512),
-				array('suhosin.get.max_value_length', 2048),
+				array('suhosin.get.max_vars', 100),
+				array('suhosin.get.max_value_length', 5120),
 				array('suhosin.post.max_array_index_length', 256),
 				array('suhosin.post.max_name_length', 512),
 				array('suhosin.post.max_totalname_length', 8192),
-				array('suhosin.post.max_vars', 4096),
+				array('suhosin.post.max_vars', 5120),
 				array('suhosin.post.max_value_length', 1000000),
 				array('suhosin.request.max_array_index_length', 256),
 				array('suhosin.request.max_totalname_length', 8192),
-				array('suhosin.request.max_vars', 4096),
+				array('suhosin.request.max_vars', 5120),
 				array('suhosin.request.max_value_length', 1000000),
 				array('suhosin.request.max_varname_length', 512)
 			);
 
 			// Value has to be zero (protection disabled), equal or higher than x to pass
 			$test_zero_or_higher_than_value = array(
-				array('suhosin.executor.max_depth', 10000),
+				array('suhosin.executor.max_depth', 512),
 				array('suhosin.executor.include.max_traversal', 6),
 				array('suhosin.memory_limit', $this->rec_mem_limit_val)
 			);

@@ -68,14 +68,14 @@ if ( !function_exists('inet_ntop'))
 		elseif(strlen($ip) == 16)
 		{
 			// Unpack IPv6
-			$ip = bin2hex($ip);
-
-			// Compact IPv6
+			$ip  = bin2hex($ip);
+			$sz  = strlen($ip);
 			$res = '';
-			for($i = strlen($ip); $i >= 4; $i = ($i-4))
+
+			while($sz >= 4)
 			{
-				$seg = substr($ip, $i-4, 4);
-				$seg = ltrim($seg, '0');
+				$sz -= 4;
+				$seg = ltrim(substr($ip, $sz, 4), '0');
 
 				if($seg != '')
 				{

@@ -6,7 +6,7 @@
  *
  * @Author  NewEraCracker
  * @License Public Domain
- * @Version 1.1.0
+ * @Version 1.1.2
  */
 
 /** Run */
@@ -471,23 +471,20 @@ class NewEra_DumpList
 				if(	false !== stripos($file, '/desktop.ini') ||
 					false !== stripos($file, '/.'))
 				{
-					continue;	
+					continue;
 				}
 
-				// Compare current time with previous
+				// Save current time
 				$mtime = @filemtime($file);
 
-				// Only update when $mtime is higher than $time
-				if($mtime > 0 && $mtime > $time)
+				// Only update when mtime is correctly set and higher than time
+				// Additionally check for writability to prevent errors
+				if($mtime > 0 && $mtime > $time && is_writable($dir))
 				{
+					// Save new timestamp
 					$time = $mtime;
-				}
 
-				// Be sure $time is correctly set and ddditionally
-				// check for writability to prevent errors
-				if($time > 0 && is_writable($dir))
-				{
-					// Update dir timestamp
+					// Update timestamp
 					touch($dir, $time);
 				}
 			}

@@ -6,7 +6,7 @@
  *
  * @Author  NewEraCracker
  * @License Public Domain
- * @Version 1.1.2
+ * @Version 1.2
  */
 
 /** Run */

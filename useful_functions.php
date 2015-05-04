@@ -7,45 +7,45 @@
 /** Array with the paths a dir contains */
 function readdir_recursive($dir='.', $show_dirs=false)
 {
-		// Set types for stack and return value
-		$stack = $result = array();
+	// Set types for stack and return value
+	$stack = $result = array();
 
-		// Initialize stack
-		$stack[] = $dir;
+	// Initialize stack
+	$stack[] = $dir;
 
-		// Pop the first element of stack and evaluate it (do this until stack is fully empty)
-		while($dir = array_shift($stack))
+	// Pop the first element of stack and evaluate it (do this until stack is fully empty)
+	while($dir = array_shift($stack))
+	{
+		$dh = opendir($dir);
+		while($dh && (false !== ($path = readdir($dh))))
 		{
-			$dh = opendir($dir);
-			while($dh && (false !== ($path = readdir($dh))))
+			if($path != '.' && $path != '..')
 			{
-				if($path != '.' && $path != '..')
+				$path = $dir.'/'.$path;
+				if(is_dir($path))
 				{
-					$path = $dir.'/'.$path;
-					if(is_dir($path))
-					{
-						// If $show_dirs is true, add dir path to result
-						if($show_dirs)
-							$result[] = $path;
-
-						// Add dir to stack for reading
-						$stack[] = $path;
-					}
-					elseif(is_file($path))
-					{
-						// Add file path to result
+					// If $show_dirs is true, add dir path to result
+					if($show_dirs)
 						$result[] = $path;
-					}
+
+					// Add dir to stack for reading
+					$stack[] = $path;
+				}
+				elseif(is_file($path))
+				{
+					// Add file path to result
+					$result[] = $path;
 				}
 			}
-			closedir($dh);
 		}
+		closedir($dh);
+	}
 
-		// Sort the array using simple ordering
-		sort($result);
+	// Sort the array using simple ordering
+	sort($result);
 
-		// Now we can return it
-		return $result;
+	// Now we can return it
+	return $result;
 }
 
 /** Normalize a text file by trimming extra whitespace */

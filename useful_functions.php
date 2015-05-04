@@ -7,49 +7,45 @@
 /** Array with the paths a dir contains */
 function readdir_recursive($dir='.', $show_dirs=false)
 {
-	return explode("\n", ltrim(readdir_recursive_string($dir, $show_dirs)));
-}
+		// Set types for stack and return value
+		$stack = $result = array();
 
-/** String with the paths a dir contains */
-function readdir_recursive_string($dir='.', $show_dirs=false)
-{
-	// Fun begins
-	$ok = ob_start(null);
-	if( !$ok )
-	{
-		trigger_error('Unable to start output buffering', E_USER_WARNING);
-		return '';
-	}
+		// Initialize stack
+		$stack[] = $dir;
 
-	// Open and read dir
-	$dh = opendir($dir);
-	while( $dh && (false !== ($path = readdir($dh))) )
-	{
-		if( $path != '.' && $path != '..')
+		// Pop the first element of stack and evaluate it (do this until stack is fully empty)
+		while($dir = array_shift($stack))
 		{
-			$path = $dir.'/'.$path;
-			if( is_dir($path) )
+			$dh = opendir($dir);
+			while($dh && (false !== ($path = readdir($dh))))
 			{
-				// If $show_dirs is true, dir names will also be listed
-				if( $show_dirs )
+				if($path != '.' && $path != '..')
 				{
-					echo "\n".$path;
+					$path = $dir.'/'.$path;
+					if(is_dir($path))
+					{
+						// If $show_dirs is true, add dir path to result
+						if($show_dirs)
+							$result[] = $path;
+
+						// Add dir to stack for reading
+						$stack[] = $path;
+					}
+					elseif(is_file($path))
+					{
+						// Add file path to result
+						$result[] = $path;
+					}
 				}
-
-				// Read recursively another dir below the original dir
-				echo readdir_recursive_string($path, $show_dirs);
 			}
-			elseif( is_file($path) )
-			{
-				// Echo filename
-				echo "\n".$path;
-			}
+			closedir($dh);
 		}
-	}
-	closedir($dh);
 
-	// Get and return our result
-	return ob_get_clean();
+		// Sort the array using simple ordering
+		sort($result);
+
+		// Now we can return it
+		return $result;
 }
 
 /** Normalize a text file by trimming extra whitespace */

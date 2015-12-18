@@ -6,7 +6,7 @@
  *
  * @Author  NewEraCracker
  * @License Public Domain
- * @Version 1.2
+ * @Version 1.4
  */
 
 /** Run */
@@ -88,7 +88,7 @@ class NewEra_DumpListUtil
 	}
 
 	/** Array with the paths a dir contains */
-	public static function readdir_recursive($dir='.', $show_dirs=false)
+	public static function readdir_recursive($dir='.', $show_dirs=false, $ignored=array())
 	{
 		// Set types for stack and return value
 		$stack = $result = array();
@@ -104,18 +104,28 @@ class NewEra_DumpListUtil
 			{
 				if($path != '.' && $path != '..')
 				{
+					// Prepend dir to current path
 					$path = $dir.'/'.$path;
+
 					if(is_dir($path))
 					{
-						// If $show_dirs is true, add dir path to result
-						if($show_dirs)
-							$result[] = $path;
+						// Check ignored dirs
+						if(is_array($ignored) && count($ignored) && in_array($path.'/', $ignored))
+							continue;
 
 						// Add dir to stack for reading
 						$stack[] = $path;
+
+						// If $show_dirs is true, add dir path to result
+						if($show_dirs)
+							$result[] = $path;
 					}
 					elseif(is_file($path))
 					{
+						// Check ignored files
+						if(is_array($ignored) && count($ignored) && in_array($path, $ignored))
+							continue;
+
 						// Add file path to result
 						$result[] = $path;
 					}
@@ -239,28 +249,11 @@ class NewEra_DumpList
 	/** Run the check on each file */
 	private function dumplist_check($testmd5 = false)
 	{
-		$this->filelist = NewEra_DumpListUtil::readdir_recursive();
+		$this->filelist = NewEra_DumpListUtil::readdir_recursive('.', false, $this->ignored);
 		$this->fileproperties = NewEra_DumpListUtil::parse_listfile($this->listfile);
 
 		foreach($this->filelist as $file)
 		{
-			if(count($this->ignored))
-			{
-				// Check ignored files
-				if(in_array($file, $this->ignored))
-				{
-					continue;
-				}
-				// Check ignored dirs
-				foreach($this->ignored as $ignored)
-				{
-					if(is_dir($ignored) && strpos($file, $ignored) === 0)
-					{
-						continue 2;
-					}
-				}
-			}
-
 			// Handle creation case
 			if(!isset($this->fileproperties["{$file}"]))
 			{
@@ -302,28 +295,11 @@ class NewEra_DumpList
 	/** Generate dump file listing */
 	private function dumplist_generate()
 	{
-		$this->filelist = NewEra_DumpListUtil::readdir_recursive();
+		$this->filelist = NewEra_DumpListUtil::readdir_recursive('.', false, $this->ignored);
 		$this->fileproperties = array();
 
 		foreach($this->filelist as $file)
 		{
-			if(count($this->ignored))
-			{
-				// Check ignored files
-				if(in_array($file, $this->ignored))
-				{
-					continue;
-				}
-				// Check ignored dirs
-				foreach($this->ignored as $ignored)
-				{
-					if(is_dir($ignored) && strpos($file, $ignored) === 0)
-					{
-						continue 2;
-					}
-				}
-			}
-
 			$this->fileproperties["{$file}"] = array(
 				'mtime'=> filemtime($file),
 				'md5'  => md5_file($file)
@@ -337,28 +313,11 @@ class NewEra_DumpList
 	/** Update dump file listing */
 	private function dumplist_update()
 	{
-		$this->filelist = NewEra_DumpListUtil::readdir_recursive();
+		$this->filelist = NewEra_DumpListUtil::readdir_recursive('.', false, $this->ignored);
 		$this->fileproperties = NewEra_DumpListUtil::parse_listfile($this->listfile);
 
 		foreach($this->filelist as $file)
 		{
-			if(count($this->ignored))
-			{
-				// Check ignored files
-				if(in_array($file, $this->ignored))
-				{
-					continue;
-				}
-				// Check ignored dirs
-				foreach($this->ignored as $ignored)
-				{
-					if(is_dir($ignored) && strpos($file, $ignored) === 0)
-					{
-						continue 2;
-					}
-				}
-			}
-
 			// Handle creation case
 			if(!isset($this->fileproperties["{$file}"]))
 			{
@@ -410,7 +369,7 @@ class NewEra_DumpList
 	private function dumplist_touchdir()
 	{
 		// Filelist including directories
-		$list = NewEra_DumpListUtil::readdir_recursive('.', true);
+		$list = NewEra_DumpListUtil::readdir_recursive('.', true, $this->ignored);
 
 		// http://php.net/manual/en/function.touch.php#refsect1-function.touch-changelog
 		if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && version_compare(PHP_VERSION, '5.3') < 0)
@@ -443,25 +402,6 @@ class NewEra_DumpList
 				{
 					$dir  = dirname($file);
 					$time = 0;
-				}
-
-				// Take in account ignored paths
-				if(count($this->ignored))
-				{
-					// Check ignored files
-					if(in_array($file, $this->ignored))
-					{
-						continue;
-					}
-
-					// Check ignored dirs
-					foreach($this->ignored as $ignored)
-					{
-						if(is_dir($ignored) && strpos($file, $ignored) === 0)
-						{
-							continue 2;
-						}
-					}
 				}
 
 				// Additionally blacklist certain names

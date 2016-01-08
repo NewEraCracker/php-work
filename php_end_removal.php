@@ -64,52 +64,55 @@ function readdir_recursive($dir='.', $show_dirs=false, $ignored=array())
 	return $result;
 }
 
-/** Normalize a PHP file by trimming extra whitespace/tags */
+/** Normalize a PHP file by trimming extra whitespace/tags and changing EOL to LF */
 function normalize_php_file($file, $remove_close_tag = true)
 {
 	// Check if we can work with the file
 	if( is_file($file) && is_readable($file) && is_writable($file) )
 	{
 		// Grab content
-		$length  = filesize($file);
-		$content = ($length ? file($file) : false);
-		$lineno  = (is_array($content) ? count($content) : false);
+		$len = filesize($file);
+		$new = ($len ? file_get_contents($file) : false);
 
 		// Check if content was grabbed
-		if($lineno)
+		if($len && $new)
 		{
-			// Adaptive fix depending if file is pure PHP code or not
-			if(strpos($content[$lineno-1], '?>') !== false)
+			// Convert line endings to LF
+			$new = str_replace("\r\n", "\n", $new);
+			$new = str_replace("\r", "\n", $new);
+
+			// Remove WS before EOF
+			$new = rtrim($new);
+
+			// Count the number of opening tags
+			$pno = substr_count($new, '<?');
+
+			// Convert to an array of lines and count them
+			$new = explode("\n", $new);
+			$lno = count($new);
+
+			// Has ending tag? If not, we simply don't care
+			if(strpos($new[$lno-1], '?>') === false)
+				return;
+
+			// Dynamic fix depending if file is pure PHP code or not
+			// Important! Always confirm the line ONLY contains the closing tag and nothing else!
+			if($remove_close_tag && $pno == 1 && $new[$lno-1] === '?>')
 			{
-				// Remove WS after closing PHP tag
-				$content[$lineno-1] = rtrim($content[$lineno-1]);
+				// Remove ending tag
+				$lno = $lno-1;
+				$new[$lno] = '';
+				unset($new[$lno]);
 
-				if($remove_close_tag && $content[$lineno-1] === '?>')
-				{
-					// Detect the number of opening tags
-					$open_count = 0;
-					foreach($content as $line)
-					{
-						if(strpos($line, '<?') !== false)
-						{
-							$open_count++;
-						}
-					}
-
-					if($open_count == 1)
-					{
-						// If file only has one opening tag, it is pure PHP and ending tag can be removed
-						$content[$lineno-1] = '';
-						unset($content[$lineno-1]);
-						$lineno--;
-					}
-				}
+				// Implode, remove trailing WS and insert final newline
+				$new = rtrim(implode("\n", $new))."\n";
+			} else {
+				// Implode and keep no final newline
+				$new = implode("\n", $new);
 			}
 
-			$new = implode($content);
-
 			// Write the file if the size changes
-			if(strlen($new) < $length)
+			if(strlen($new) > 0 && strlen($new) < $len)
 			{
 				file_put_contents($file, $new);
 			}
@@ -135,7 +138,7 @@ foreach(readdir_recursive($path) as $f)
 	// Normalize PHP files
 	if(in_array($ext, $php_types))
 	{
-		normalize_php_file($f, true);
+		normalize_php_file($f);
 	}
 }
 ?>

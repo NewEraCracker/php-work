@@ -64,8 +64,8 @@ function readdir_recursive($dir='.', $show_dirs=false, $ignored=array())
 	return $result;
 }
 
-/** Normalize a text file by trimming extra whitespace */
-function normalize_php_file($file)
+/** Normalize a PHP file by trimming extra whitespace/tags */
+function normalize_php_file($file, $remove_close_tag = true)
 {
 	// Check if we can work with the file
 	if( is_file($file) && is_readable($file) && is_writable($file) )
@@ -78,10 +78,32 @@ function normalize_php_file($file)
 		// Check if content was grabbed
 		if($lineno)
 		{
-			// Remove WS after closing PHP tag
+			// Adaptive fix depending if file is pure PHP code or not
 			if(strpos($content[$lineno-1], '?>') !== false)
 			{
+				// Remove WS after closing PHP tag
 				$content[$lineno-1] = rtrim($content[$lineno-1]);
+
+				if($remove_close_tag && $content[$lineno-1] === '?>')
+				{
+					// Detect the number of opening tags
+					$open_count = 0;
+					foreach($content as $line)
+					{
+						if(strpos($line, '<?') !== false)
+						{
+							$open_count++;
+						}
+					}
+
+					if($open_count == 1)
+					{
+						// If file only has one opening tag, it is pure PHP and ending tag can be removed
+						$content[$lineno-1] = '';
+						unset($content[$lineno-1]);
+						$lineno--;
+					}
+				}
 			}
 
 			$new = implode($content);
@@ -113,7 +135,7 @@ foreach(readdir_recursive($path) as $f)
 	// Normalize PHP files
 	if(in_array($ext, $php_types))
 	{
-		normalize_php_file($f);
+		normalize_php_file($f, true);
 	}
 }
 ?>

@@ -5,7 +5,7 @@
 */
 
 /** Array with the paths a dir contains */
-function readdir_recursive($dir='.', $show_dirs=false)
+function readdir_recursive($dir='.', $show_dirs=false, $ignored=array())
 {
 	// Set types for stack and return value
 	$stack = $result = array();
@@ -21,18 +21,28 @@ function readdir_recursive($dir='.', $show_dirs=false)
 		{
 			if($path != '.' && $path != '..')
 			{
+				// Prepend dir to current path
 				$path = $dir.'/'.$path;
+
 				if(is_dir($path))
 				{
-					// If $show_dirs is true, add dir path to result
-					if($show_dirs)
-						$result[] = $path;
+					// Check ignored dirs
+					if(is_array($ignored) && count($ignored) && in_array($path.'/', $ignored))
+						continue;
 
 					// Add dir to stack for reading
 					$stack[] = $path;
+
+					// If $show_dirs is true, add dir path to result
+					if($show_dirs)
+						$result[] = $path;
 				}
 				elseif(is_file($path))
 				{
+					// Check ignored files
+					if(is_array($ignored) && count($ignored) && in_array($path, $ignored))
+						continue;
+
 					// Add file path to result
 					$result[] = $path;
 				}

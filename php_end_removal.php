@@ -2,6 +2,7 @@
 /**
  * Author: NewEraCracker
  * License: Public Domain
+ * Version: 2016.0108.3
  */
 
 # Basic configuration
@@ -71,48 +72,38 @@ function normalize_php_file($file, $remove_close_tag = true)
 	if( is_file($file) && is_readable($file) && is_writable($file) )
 	{
 		// Grab content
-		$len = filesize($file);
-		$new = ($len ? file_get_contents($file) : false);
+		$size = filesize($file);
+		$new  = ($size ? file_get_contents($file) : false);
 
 		// Check if content was grabbed
-		if($len && $new)
+		if($size && $new)
 		{
-			// Convert line endings to LF
+			// Convert line endings to LF and remove WS before EOF
 			$new = str_replace("\r\n", "\n", $new);
 			$new = str_replace("\r", "\n", $new);
-
-			// Remove WS before EOF
 			$new = rtrim($new);
+			$len = strlen($new);
 
-			// Count the number of opening tags
-			$pno = substr_count($new, '<?');
-
-			// Convert to an array of lines and count them
-			$new = explode("\n", $new);
-			$lno = count($new);
+			// Count the number of opening tags for full & short types
+			$php_tags_no   = substr_count($new, '<?php');
+			$short_tags_no = substr_count($new, '<?') - $php_tags_no;
 
 			// Has ending tag? If not, we simply don't care
-			if(strpos($new[$lno-1], '?>') === false)
+			// Important! Be very strict when checking location! Keep this line where it is!
+			if(substr($new, -2) !== '?>')
 				return;
 
 			// Dynamic fix depending if file is pure PHP code or not
-			// Important! Always confirm the line ONLY contains the closing tag and nothing else!
-			if($remove_close_tag && $pno == 1 && $new[$lno-1] === '?>')
+			// Important! File must not have short tags neither have more than one opening tag!
+			if($remove_close_tag && $short_tags_no == 0 && $php_tags_no == 1)
 			{
-				// Remove ending tag
-				$lno = $lno-1;
-				$new[$lno] = '';
-				unset($new[$lno]);
-
-				// Implode, remove trailing WS and insert final newline
-				$new = rtrim(implode("\n", $new))."\n";
-			} else {
-				// Implode and keep no final newline
-				$new = implode("\n", $new);
+				// Remove ending tag, trailing WS and insert final newline
+				$new = rtrim(substr($new, 0, -2))."\n";
+				$len = strlen($new);
 			}
 
 			// Write the file if the size changes
-			if(strlen($new) > 0 && strlen($new) < $len)
+			if($len > 0 && $len < $size)
 			{
 				file_put_contents($file, $new);
 			}

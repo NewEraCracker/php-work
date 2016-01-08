@@ -2,7 +2,7 @@
 /**
  * Author: NewEraCracker
  * License: Public Domain
- * Version: 2016.0108.3
+ * Version: 2016.0108.4
  */
 
 # Basic configuration
@@ -89,11 +89,11 @@ function normalize_php_file($file, $remove_close_tag = true)
 			$short_tags_no = substr_count($new, '<?') - $php_tags_no;
 
 			// Has ending tag? If not, we simply don't care
-			// Important! Be very strict when checking location! Keep this line where it is!
+			// Important! Be very strict when checking offset! Keep this line where it is!
 			if(substr($new, -2) !== '?>')
 				return;
 
-			// Dynamic fix depending if file is pure PHP code or not
+			// Dynamic fix depending if file is (almost) pure PHP code or not
 			// Important! File must not have short tags neither have more than one opening tag!
 			if($remove_close_tag && $short_tags_no == 0 && $php_tags_no == 1)
 			{

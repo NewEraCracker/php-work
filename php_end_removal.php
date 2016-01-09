@@ -2,7 +2,13 @@
 /**
  * Author: NewEraCracker
  * License: Public Domain
- * Version: 2016.0108.4
+ * Version: 2016.0109.1
+ *
+ * Will remove PHP ending tag if code conforms certain specifications.
+ *
+ * https://secure.php.net/manual/en/language.basic-syntax.phptags.php
+ * https://secure.php.net/manual/en/language.basic-syntax.instruction-separation.php
+ *
  */
 
 # Basic configuration
@@ -84,22 +90,42 @@ function normalize_php_file($file, $remove_close_tag = true)
 			$new = rtrim($new);
 			$len = strlen($new);
 
-			// Count the number of opening tags for full & short types
-			$php_tags_no   = substr_count($new, '<?php');
-			$short_tags_no = substr_count($new, '<?') - $php_tags_no;
-
 			// Has ending tag? If not, we simply don't care
 			// Important! Be very strict when checking offset! Keep this line where it is!
 			if(substr($new, -2) !== '?>')
 				return;
 
+			// Count the number of opening tags for full & short types
+			$php_tags_no   = substr_count($new, '<?php');
+			$short_tags_no = substr_count($new, '<?') - $php_tags_no;
+
 			// Dynamic fix depending if file is (almost) pure PHP code or not
 			// Important! File must not have short tags neither have more than one opening tag!
 			if($remove_close_tag && $short_tags_no == 0 && $php_tags_no == 1)
 			{
+				// Can ending tag be removed?
+				for($i=$len-3; $i>=0; $i--)
+				{
+					if(trim($new[$i]) !== '')
+					{
+						if($new[$i] !== ';' && $new[$i] !== '}')
+						{
+							// If a valid instruction terminator wasn't found
+							// We shouldn't remove close tag. Otherwise things will break!
+							$remove_close_tag = false;
+						}
+
+						// Always break when first non-WS char is found
+						break;
+					}
+				}
+
 				// Remove ending tag, trailing WS and insert final newline
-				$new = rtrim(substr($new, 0, -2))."\n";
-				$len = strlen($new);
+				if($remove_close_tag)
+				{
+					$new = rtrim(substr($new, 0, -2))."\n";
+					$len = strlen($new);
+				}
 			}
 
 			// Write the file if the size changes

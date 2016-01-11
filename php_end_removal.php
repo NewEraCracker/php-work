@@ -103,28 +103,21 @@ function normalize_php_file($file, $remove_close_tag = true)
 			// Important! File must not have short tags neither have more than one opening tag!
 			if($remove_close_tag && $short_tags_no == 0 && $php_tags_no == 1)
 			{
-				// Can ending tag be removed?
-				for($i=$len-3; $i>=0; $i--)
-				{
-					if(trim($new[$i]) !== '')
-					{
-						if($new[$i] !== ';' && $new[$i] !== '}')
-						{
-							// If a valid instruction terminator wasn't found
-							// We shouldn't remove close tag. Otherwise things will break!
-							$remove_close_tag = false;
-						}
+				// Remove ending tag
+				$new = rtrim(substr($new, 0, -2));
+				$len = strlen($new);
 
-						// Always break when first non-WS char is found
-						break;
-					}
+				if($new[$len-1] !== ';' && $new[$len-1] !== '}')
+				{
+					// Statement may not be complete! Tag needs to be re-added
+					$new .= "\n?>";
+					$len  = strlen($new);
 				}
-
-				// Remove ending tag, trailing WS and insert final newline
-				if($remove_close_tag)
+				else
 				{
-					$new = rtrim(substr($new, 0, -2))."\n";
-					$len = strlen($new);
+					// Insert final newline
+					$new .= "\n";
+					$len  = strlen($new);
 				}
 			}
 

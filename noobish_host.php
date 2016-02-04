@@ -68,4 +68,3 @@ else
 		echo "Issue: {$issue}".$crlf;
 }
 echo "</pre>";
-?>

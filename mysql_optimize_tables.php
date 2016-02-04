@@ -84,4 +84,3 @@ while( $tables = db_fetch($show_tables_result) )
 }
 
 echo "The database has been successfully optimized!\n";
-?>

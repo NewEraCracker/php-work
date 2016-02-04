@@ -91,4 +91,3 @@ foreach(readdir_recursive($path) as $file)
 		passthru(escapeshellarg(PHP_EXE_PATH).' -n -l '.escapeshellarg($file));
 	}
 }
-?>

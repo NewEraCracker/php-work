@@ -187,4 +187,3 @@ if( check_proxy() )
 {
 	die("<title>403: Forbidden</title>Oops... A proxy");
 }
-?>

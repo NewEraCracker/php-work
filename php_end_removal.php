@@ -2,7 +2,7 @@
 /**
  * Author: NewEraCracker
  * License: Public Domain
- * Version: 2016.0109.1
+ * Version: 2016.0204.1
  *
  * Will remove PHP ending tag if code conforms certain specifications.
  *
@@ -75,59 +75,55 @@ function readdir_recursive($dir='.', $show_dirs=false, $ignored=array())
 function normalize_php_file($file, $remove_close_tag = true)
 {
 	// Check if we can work with the file
-	if( is_file($file) && is_readable($file) && is_writable($file) )
+	if(!is_file($file) || !is_readable($file) || !is_writable($file))
 	{
-		// Grab content
-		$size = filesize($file);
-		$new  = ($size ? file_get_contents($file) : false);
+		return false;
+	}
 
-		// Check if content was grabbed
-		if($size && $new)
+	// Grab content and trim ending whitespace
+	$contents = rtrim(file_get_contents($file));
+	$stripped = rtrim(php_strip_whitespace($file));
+
+	// Check if content was grabbed
+	if(!$contents || !$stripped)
+	{
+		return false;
+	}
+
+	// Verify both strings have begin and ending tags. Ignore otherwise.
+	// Important! Be very strict when checking offset! Keep this line where it is!
+	if(substr($stripped, 0, 5) !== '<?php' || substr($stripped, -2) !== '?>' ||
+	   substr($contents, 0, 5) !== '<?php' || substr($contents, -2) !== '?>')
+	{
+		return false;
+	}
+
+	// Convert line endings to LF
+	$contents = str_replace("\r", "\n", str_replace("\r\n", "\n", $contents));
+
+	// Count the number of opening tags for full & short types.
+	// We'll count from contents to ensure we get accurate values.
+	$php_tags_no   = substr_count($contents, '<?php');
+	$short_tags_no = substr_count($contents, '<?') - $php_tags_no;
+
+	// Dynamic fix depending if file is pure PHP code or not.
+	// Important! File must not have short tags neither have more than one opening tag!
+	if($remove_close_tag && $short_tags_no == 0 && $php_tags_no == 1)
+	{
+		$stripped     = rtrim(substr($stripped, 0, -2));
+		$stripped_len = strlen($stripped);
+
+		// Test the stripped file validity without the tag
+		if($stripped[$stripped_len-1] === ';' || $stripped[$stripped_len-1] === '}')
 		{
-			// Convert line endings to LF and remove WS before EOF
-			$new = str_replace("\r\n", "\n", $new);
-			$new = str_replace("\r", "\n", $new);
-			$new = rtrim($new);
-			$len = strlen($new);
-
-			// Has ending tag? If not, we simply don't care
-			// Important! Be very strict when checking offset! Keep this line where it is!
-			if(substr($new, -2) !== '?>')
-				return;
-
-			// Count the number of opening tags for full & short types
-			$php_tags_no   = substr_count($new, '<?php');
-			$short_tags_no = substr_count($new, '<?') - $php_tags_no;
-
-			// Dynamic fix depending if file is (almost) pure PHP code or not
-			// Important! File must not have short tags neither have more than one opening tag!
-			if($remove_close_tag && $short_tags_no == 0 && $php_tags_no == 1)
-			{
-				// Remove ending tag
-				$new = rtrim(substr($new, 0, -2));
-				$len = strlen($new);
-
-				if($new[$len-1] !== ';' && $new[$len-1] !== '}')
-				{
-					// Statement may not be complete! Tag needs to be re-added
-					$new .= "\n?>";
-					$len  = strlen($new);
-				}
-				else
-				{
-					// Insert final newline
-					$new .= "\n";
-					$len  = strlen($new);
-				}
-			}
-
-			// Write the file if the size changes
-			if($len > 0 && $len < $size)
-			{
-				file_put_contents($file, $new);
-			}
+			// Ending tag removal is safe.
+			// Act on the contents themselves and add a final EOL.
+			$contents = rtrim(substr($contents, 0, -2))."\n";
 		}
 	}
+
+	// Write the new file
+	return file_put_contents($file, $contents);
 }
 
 # Main

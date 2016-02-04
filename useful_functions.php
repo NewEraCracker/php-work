@@ -92,4 +92,3 @@ function normalize_text_file($f)
 		}
 	}
 }
-?>

@@ -89,5 +89,3 @@ MemcacheSimpleTest($memcache_obj,"mykey");
 
 // Sample usage of MemcachePrintDetails
 MemcachePrintDetails($memcache_obj->getStats());
-
-?>

@@ -176,4 +176,3 @@ class NewEra_IPv6Hack
 		return self::ipv6_to_ipv4($ip);
 	}
 }
-?>

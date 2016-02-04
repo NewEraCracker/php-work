@@ -1013,4 +1013,3 @@ $compatibility_checker->run();
 
 // Output compatibility checker results
 $compatibility_checker->output();
-?>

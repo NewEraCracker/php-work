@@ -48,5 +48,3 @@ function improved_explode($delimiter,$string,$escape=null)
 // Example usage
 $mystring = "test=2\\=2";
 var_dump( improved_explode('=',$mystring,'\\') );
-
-?>

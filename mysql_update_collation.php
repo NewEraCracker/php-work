@@ -91,4 +91,3 @@ while( $tables = db_fetch($show_tables_result) )
 }
 
 echo "The collation of your database has been successfully changed!\n";
-?>

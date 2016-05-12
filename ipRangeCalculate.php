@@ -323,7 +323,7 @@ function isInIpRange( $ip, $range )
 
 	for( $i=0; $i<strlen($ip); $i++)
 	{
-		if( ord($ipRangeLower[$i]) <= ord($ip[$i]) && ord($ip[$i]) <= ord($ipRangeHigher) )
+		if( ord($ipRangeLower[$i]) <= ord($ip[$i]) && ord($ip[$i]) <= ord($ipRangeHigher[$i]) )
 		{
 			// This IP bit is into IP Range
 			continue;

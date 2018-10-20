@@ -1,12 +1,12 @@
 <?php
 /**
- * Usage: dumplist.php [check|testmd5|generate|update|touchdir]
+ * Usage: dumplist.php [check|testmd5|testsha1|updatesha1|generate|update|touchdir]
  *
  * From the shadows. We shall rise...
  *
  * @Author  Jorge Oliveira (NewEraCracker)
  * @License Public Domain
- * @Version 2.7.1
+ * @Version 2.7.2
  */
 
 /** Increase memory limit to handle large amounts of data */
@@ -306,12 +306,7 @@ class NewEra_DumpList {
 			if ($updatesha1 && !$properties['sha1']) {
 				if (md5_file($file) == $properties['md5']) {
 					$properties['sha1'] = sha1_file($file);
-
-					$this->fileproperties["{$file}"] = array(
-						'mtime' => $properties['mtime'],
-						'sha1'  => $properties['sha1'],
-						'md5'   => $properties['md5']
-					);
+					$this->fileproperties["{$file}"] = $properties;
 				} else {
 					echo "{$file} Expected MD5: {$properties['md5']} Got: {$md5}.\n";
 					continue;

@@ -57,12 +57,10 @@
 	}
 	
 	$original_path = 'D:';
+	$backup_path = 'F:';
+
 	$original_len  = strlen($original_path);
 	$original_list = readdir_recursive($original_path);
-
-	$backup_path = 'F:';
-	// $backup_len  = strlen($backup_path);
-	// $backup_list = readdir_recursive($backup_path);
 
 	if(!file_exists($original_path) || !file_exists($backup_path))
 	{
@@ -79,10 +77,12 @@
 		{
 			if(filemtime($backup_filename) != $filename_time)
 			{
-				$filename_sha1 = sha1_file($filename);
-				$backup_sha1   = sha1_file($backup_filename);
+				$file_md5    = md5_file($filename);
+				$backup_md5  = md5_file($backup_filename);
+				$file_sha1   = sha1_file($filename);
+				$backup_sha1 = sha1_file($backup_filename);
 
-				if($backup_sha1 == $filename_sha1) {
+				if($file_md5 == $backup_md5 && $file_sha1 == $backup_sha1) {
 					touch($filename, $filename_time, $filename_time);
 					touch($backup_filename, $filename_time, $filename_time);
 					echo 'Fixing '.$filename.PHP_EOL;

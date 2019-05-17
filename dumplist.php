@@ -216,7 +216,7 @@ class NewEra_DumpList {
 		// Build ignored paths
 		$this->ignored  = array_merge(
 			array(	$listfile,				 /* List file */
-					'./'.basename(__FILE__), /* This file */
+		//			'./'.basename(__FILE__), /* This file */
 			), $ignored);					 /* Original ignored array */
 
 		// Check CLI

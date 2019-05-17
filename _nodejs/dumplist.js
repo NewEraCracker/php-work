@@ -265,7 +265,7 @@ class NewEra_DumpList {
     /** Ignored paths */
     this.ignored = [
       listfile,                      /* List file */
-      ('./' + basename(__filename)), /* This file */
+  //  ('./' + basename(__filename)), /* This file */
       ...ignored                     /* Original ignored array */
      ];
 

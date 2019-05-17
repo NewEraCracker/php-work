@@ -6,9 +6,9 @@
  * From the shadows. We shall rise...
  *
  * @Author  Jorge Oliveira (NewEraCracker)
- * @Date    May 16th 2019
+ * @Date    May 17th 2019
  * @License Public Domain
- * @Version 0.0.2-node
+ * @Version 0.0.3-node
  */
 
 const [crypto, fs, { promisify }] = [require('crypto'), require('fs'), require('util')];
@@ -130,7 +130,7 @@ class NewEra_DumpListUtil {
           // Not an hack: We have to remove the asterisk in begining and restore ./ in path for Node.js to be able to work it out
           const file = './' + comment['name'][i].substr(1);
 
-          fileproperties[file] = {
+          fileproperties[`${file}`] = {
             'mtime': comment['mtime'][i],
             'sha1': comment['sha1'][i] || '',
             'md5': content['md5'][i]
@@ -156,7 +156,7 @@ class NewEra_DumpListUtil {
 
     // Sort file properties array and walk
     for (const file of Object.keys(fileproperties).sort(NewEra_Compare.prototype.sort_files_by_name)) {
-      const properties = fileproperties[file];
+      const properties = fileproperties[`${file}`];
 
       // Not an hack: We have to replace ./ in path by an asterisk for other applications (QuickSFV, TeraCopy...) to be able to work it out
       const filename = '*' + file.substr(2);
@@ -187,6 +187,7 @@ class NewEra_DumpListUtil {
         // Prepend dir to current path
         path = dir + '/' + path;
 
+        // Stat the path to determine attributes
         const stats = await stat(path);
 
         if (stats.isDirectory()) {
@@ -329,7 +330,7 @@ class NewEra_DumpList {
     }
 
     for (const file of Object.keys(this.fileproperties)) {
-      const properties = this.fileproperties[file];
+      const properties = this.fileproperties[`${file}`];
 
       // Handle deletion
       if (!await file_exists(file)) {
@@ -369,7 +370,7 @@ class NewEra_DumpList {
 
         if (md5 === properties['md5']) {
           properties['sha1'] = sha1_file(file);
-          this.fileproperties[file] = properties;
+          this.fileproperties[`${file}`] = properties;
         } else {
           console.log(`${file} Expected MD5: ${properties['md5']} Got: ${md5}.`);
           continue;
@@ -391,7 +392,7 @@ class NewEra_DumpList {
     this.fileproperties = {};
 
     for (const file of this.filelist) {
-      this.fileproperties[file] = {
+      this.fileproperties[`${file}`] = {
         mtime: await filemtime(file),
         sha1: await sha1_file(file),
         md5: await md5_file(file)
@@ -415,7 +416,7 @@ class NewEra_DumpList {
       // Handle creation case
       if (!this.fileproperties.hasOwnProperty(file))
       {
-        this.fileproperties[file] = {
+        this.fileproperties[`${file}`] = {
           'mtime': await filemtime(file),
           'sha1': await sha1_file(file),
           'md5': await md5_file(file)
@@ -429,7 +430,7 @@ class NewEra_DumpList {
 
     // Handle each file in the properties list
     for (const file of Object.keys(this.fileproperties)) {
-      const properties = this.fileproperties[file];
+      const properties = this.fileproperties[`${file}`];
 
       // Handle deletion (Save it, will delete the keys later)
       if (!await file_exists(file)) {
@@ -439,7 +440,7 @@ class NewEra_DumpList {
 
       // Handle file modification
       if (await filemtime(file) != properties['mtime']) {
-        this.fileproperties["{file}"] = {
+        this.fileproperties[`${file}`] = {
           'mtime': await filemtime(file),
           'sha1': await sha1_file(file),
           'md5': await md5_file(file)

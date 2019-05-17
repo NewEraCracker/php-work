@@ -6,7 +6,7 @@
  *
  * @Author  Jorge Oliveira (NewEraCracker)
  * @License Public Domain
- * @Version 2.9.2
+ * @Version 2.9.3
  */
 
 /** Increase memory limit to handle large amounts of data */
@@ -308,7 +308,9 @@ class NewEra_DumpList {
 
 			// Migrate SHA1 if required
 			if ($updatesha1 && !$properties['sha1']) {
-				if (md5_file($file) == $properties['md5']) {
+				$md5 = md5_file($file);
+
+				if ($md5 == $properties['md5']) {
 					$properties['sha1'] = sha1_file($file);
 					$this->fileproperties["{$file}"] = $properties;
 				} else {
